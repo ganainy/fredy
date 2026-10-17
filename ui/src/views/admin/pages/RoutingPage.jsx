@@ -132,6 +132,23 @@ export default function RoutingPage() {
         </AdminField>
 
         {dialsOf('travel', false)}
+
+        <AdminField
+          wide
+          label={t('settings.googleMapsApiKey')}
+          help={t('settings.googleMapsApiKeyHelp')}
+          htmlFor="googleMapsApiKey"
+        >
+          <Input
+            id="googleMapsApiKey"
+            type="password"
+            mode="password"
+            autoComplete="new-password"
+            value={form.googleMapsApiKey}
+            placeholder={t('settings.googleMapsApiKeyPlaceholder')}
+            onChange={(value) => setField('googleMapsApiKey', value)}
+          />
+        </AdminField>
       </SegmentPart>
 
       <SegmentPart name={t('settings.routingPlaces')} helpText={t('settings.routingPlacesHelp')} helpMode="popover">

@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { AutoComplete, Banner, Button, Dropdown, Input, Select } from '@douyinfe/semi-ui-19';
+import { AutoComplete, Banner, Button, Checkbox, Dropdown, Input, Select } from '@douyinfe/semi-ui-19';
 import { IconDelete, IconMore } from '@douyinfe/semi-icons';
 
 import { PLACE_CATEGORIES, ADDRESS_ICON, placeCategoryIcon } from '../../../../services/travelTime/placeCategories.js';
@@ -60,6 +60,11 @@ export default function TravelTimeEntry({ row, startOpen, suggestions, onSearch,
       : t('settings.placeTypeSummaryIncomplete');
   } else if (mode === 'transit') {
     summary = t('settings.addressSummary', { mode: byMode, time: row.departure?.time ?? DEFAULT_DEPARTURE.time });
+  } else if (mode === 'car' && row.trafficAware) {
+    summary = t('settings.addressSummaryTrafficAware', {
+      mode: byMode,
+      time: row.arriveBy?.time ?? DEFAULT_DEPARTURE.time,
+    });
   } else {
     summary = t('settings.addressSummaryNoTime', { mode: byMode });
   }
@@ -138,7 +143,8 @@ export default function TravelTimeEntry({ row, startOpen, suggestions, onSearch,
             </Select>
 
             {/* Only public transport depends on a time of day. A drive is a drive whenever you make
-                it, so asking for one would be asking a question with no effect. */}
+                it, so asking for one would be asking a question with no effect - unless it is
+                measured with real traffic, which is exactly a question about when. */}
             {mode === 'transit' && (
               <>
                 <span className="settingsShell__inlineLabel">{t('settings.addressDepartureLabel')}</span>
@@ -156,6 +162,38 @@ export default function TravelTimeEntry({ row, startOpen, suggestions, onSearch,
                     </Select.Option>
                   ))}
                 </Select>
+              </>
+            )}
+
+            {/* Google's Routes API has a free tier but is not free, so it is opted into rather than
+                offered as the default the moment a key is configured. */}
+            {mode === 'car' && (
+              <>
+                <Checkbox
+                  checked={row.trafficAware === true}
+                  onChange={(e) => onChange({ trafficAware: e.target.checked })}
+                >
+                  {t('settings.addressTrafficAwareLabel')}
+                </Checkbox>
+                {row.trafficAware === true && (
+                  <>
+                    <span className="settingsShell__inlineLabel">{t('settings.addressArriveByLabel')}</span>
+                    <Select
+                      size="small"
+                      style={{ width: 100 }}
+                      value={row.arriveBy?.time ?? DEFAULT_DEPARTURE.time}
+                      onChange={(value) =>
+                        onChange({ arriveBy: { ...(row.arriveBy ?? DEFAULT_DEPARTURE), time: value } })
+                      }
+                    >
+                      {DEPARTURE_TIMES.map((time) => (
+                        <Select.Option key={time} value={time}>
+                          {time}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </>
+                )}
               </>
             )}
           </div>

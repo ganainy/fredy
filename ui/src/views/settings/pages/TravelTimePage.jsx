@@ -49,6 +49,8 @@ function toRow(entry) {
     coords: entry.coords || null,
     departure: entry.departure || DEFAULT_DEPARTURE,
     mode: entry.mode || 'transit',
+    trafficAware: entry.trafficAware === true,
+    arriveBy: entry.arriveBy || DEFAULT_DEPARTURE,
   };
 }
 
@@ -195,7 +197,14 @@ export default function TravelTimePage() {
           .map((row) =>
             row.kind === 'category'
               ? { kind: 'category', category: row.category, label: row.label, departure: row.departure, mode: row.mode }
-              : { label: row.label, address: row.address, departure: row.departure, mode: row.mode },
+              : {
+                  label: row.label,
+                  address: row.address,
+                  departure: row.departure,
+                  mode: row.mode,
+                  trafficAware: row.mode === 'car' && row.trafficAware === true,
+                  arriveBy: row.arriveBy,
+                },
           ),
       );
       setRows((responseJson.home_addresses || []).map(toRow));

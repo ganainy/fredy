@@ -147,6 +147,40 @@ describe('POST /api/user/settings/home-address, what a save invalidates', () => 
     await app.close();
   });
 
+  it('still re-measures when traffic-aware routing is switched on', async () => {
+    const app = await buildServer();
+    await save(app, [{ label: 'Work', address: 'Office Street 1', mode: 'car' }]);
+    await save(app, [{ label: 'Work', address: 'Office Street 1', mode: 'car', trafficAware: true }]);
+
+    expect(invalidations).toHaveLength(2);
+    await app.close();
+  });
+
+  it('still re-measures when the traffic-aware arrival time moves', async () => {
+    const app = await buildServer();
+    await save(app, [
+      { label: 'Work', address: 'Office Street 1', mode: 'car', trafficAware: true, arriveBy: { time: '09:00' } },
+    ]);
+    await save(app, [
+      { label: 'Work', address: 'Office Street 1', mode: 'car', trafficAware: true, arriveBy: { time: '08:00' } },
+    ]);
+
+    expect(invalidations).toHaveLength(2);
+    await app.close();
+  });
+
+  /**
+   * Only meaningful for a car address, so a flag left behind by a mode that has since moved away
+   * from car must not silently apply the moment somebody switches back to it.
+   */
+  it('drops the traffic-aware flag when the address is not measured by car', async () => {
+    const app = await buildServer();
+    await save(app, [{ label: 'Work', address: 'Office Street 1', mode: 'transit', trafficAware: true }]);
+
+    expect(stored.home_addresses[0].trafficAware).toBeUndefined();
+    await app.close();
+  });
+
   /**
    * Travel times and distances are both stored under the label, so a rename really does orphan them.
    * The sweeper can adopt a renamed journey without a request, but only if it is asked to look.

@@ -7,10 +7,14 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 // Mock the CloakBrowser launcher so no real Chromium binary is needed and we can
 // assert which options get forwarded to it.
-const { launchMock } = vi.hoisted(() => ({ launchMock: vi.fn() }));
+const { launchMock, launchPersistentContextMock } = vi.hoisted(() => ({
+  launchMock: vi.fn(),
+  launchPersistentContextMock: vi.fn(),
+}));
 
 vi.mock('cloakbrowser/puppeteer', () => ({
   launch: launchMock,
+  launchPersistentContext: launchPersistentContextMock,
 }));
 
 const { launchBrowser, closeBrowser } = await import('../../../lib/services/extractor/puppeteerExtractor.js');
@@ -40,6 +44,8 @@ describe('launchBrowser proxy forwarding', () => {
   beforeEach(() => {
     launchMock.mockReset();
     launchMock.mockResolvedValue({ close: async () => {} });
+    launchPersistentContextMock.mockReset();
+    launchPersistentContextMock.mockResolvedValue({ close: async () => {} });
   });
 
   it('forwards proxyUrl to CloakBrowser as the proxy option', async () => {
@@ -54,6 +60,21 @@ describe('launchBrowser proxy forwarding', () => {
 
     expect(launchMock).toHaveBeenCalledTimes(1);
     expect(launchMock.mock.calls[0][0].proxy).toBeUndefined();
+  });
+
+  it('launches a throwaway profile when no userDataDir is given', async () => {
+    await launchBrowser('https://www.immowelt.de/', {});
+
+    expect(launchMock).toHaveBeenCalledTimes(1);
+    expect(launchPersistentContextMock).not.toHaveBeenCalled();
+  });
+
+  it('launches a persistent profile when userDataDir is given, for the apply-automation flow', async () => {
+    await launchBrowser('https://www.immowelt.de/', { userDataDir: '/db/apply-browser-profile' });
+
+    expect(launchPersistentContextMock).toHaveBeenCalledTimes(1);
+    expect(launchPersistentContextMock.mock.calls[0][0]).toMatchObject({ userDataDir: '/db/apply-browser-profile' });
+    expect(launchMock).not.toHaveBeenCalled();
   });
 });
 

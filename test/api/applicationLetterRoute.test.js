@@ -149,4 +149,15 @@ describe('GET /api/listings/:listingId/application', () => {
     await handler(request(), replyDouble());
     expect(tracked).toContain('APPLICATION_LETTER_DRAFTED');
   });
+
+  it('says apply-automation has nothing for a portal it does not support', async () => {
+    const result = await handler(request(), replyDouble());
+    expect(result.canAutoApply).toBe(false);
+  });
+
+  it('says apply-automation can handle ImmoScout24', async () => {
+    const immoscoutHandler = await loadHandler({ found: { ...listing, provider: 'immoscout' } });
+    const result = await immoscoutHandler(request(), replyDouble());
+    expect(result.canAutoApply).toBe(true);
+  });
 });

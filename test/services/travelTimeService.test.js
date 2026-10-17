@@ -9,14 +9,20 @@ vi.mock('../../lib/services/transit/transitousClient.js', () => ({
   fetchPlan: vi.fn(),
   isTransitPaused: vi.fn(() => false),
 }));
+vi.mock('../../lib/services/transit/googleRoutesClient.js', () => ({
+  fetchTrafficAwareRoute: vi.fn(),
+}));
 
 import { fetchPlan } from '../../lib/services/transit/transitousClient.js';
+import { fetchTrafficAwareRoute } from '../../lib/services/transit/googleRoutesClient.js';
 import { clearTransitCache } from '../../lib/services/transit/transitCache.js';
 import {
   DEFAULT_DEPARTURE,
   getTravelTimes,
+  getTrafficAwareCarTime,
   normalizePlan,
   referenceDeparture,
+  trafficDeparture,
 } from '../../lib/services/transit/travelTimeService.js';
 
 /** A direct itinerary as MOTIS returns one: a single leg carrying the mode. */
@@ -29,6 +35,7 @@ const direct = (mode, seconds, extra = {}) => ({
 beforeEach(() => {
   clearTransitCache();
   vi.mocked(fetchPlan).mockReset();
+  vi.mocked(fetchTrafficAwareRoute).mockReset();
 });
 
 afterEach(() => {
@@ -234,5 +241,57 @@ describe('getTravelTimes', () => {
     expect(result.ok).toBe(true);
     expect(result.times.car.minutes).toBe(10);
     expect(fetchPlan).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('trafficDeparture', () => {
+  it('leaves earlier than it arrives, by the buffer', () => {
+    const now = new Date(2026, 7, 3, 9, 0, 0); // Monday
+    const departure = trafficDeparture({ time: '09:00' }, 30, now);
+
+    // The arrival this targets is tomorrow's 09:00 (right now is itself 09:00, which already
+    // counts as passed); departing 30 minutes before that lands on Tuesday 08:30.
+    expect(departure.getHours()).toBe(8);
+    expect(departure.getMinutes()).toBe(30);
+    expect(departure.getDate()).toBe(4);
+  });
+
+  it('falls back to the default arrival time for anything unusable', () => {
+    const now = new Date(2026, 7, 3, 9, 0, 0);
+    const departure = trafficDeparture({ time: 'nonsense' }, 30, now);
+
+    expect(departure.getHours()).toBe(7);
+    expect(departure.getMinutes()).toBe(30);
+  });
+});
+
+describe('getTrafficAwareCarTime', () => {
+  const pair = { fromLat: 52.52, fromLng: 13.405, toLat: 52.516, toLng: 13.3777, arriveBy: { time: '09:00' } };
+
+  it('reports an outage when Google has nothing to say', async () => {
+    vi.mocked(fetchTrafficAwareRoute).mockResolvedValueOnce(null);
+    expect(await getTrafficAwareCarTime(pair)).toEqual({ ok: false, reason: 'unavailable' });
+  });
+
+  it('turns kilometres into the same distanceMeters shape the street routing uses', async () => {
+    vi.mocked(fetchTrafficAwareRoute).mockResolvedValueOnce({ minutes: 42, km: 18.5, geometry: 'abc' });
+
+    const result = await getTrafficAwareCarTime(pair);
+
+    expect(result).toEqual({ ok: true, route: { minutes: 42, distanceMeters: 18500, geometry: 'abc' } });
+  });
+
+  it('asks once per unique origin, destination and arrival time', async () => {
+    vi.mocked(fetchTrafficAwareRoute).mockResolvedValue({ minutes: 20, km: 10, geometry: null });
+
+    await getTrafficAwareCarTime(pair);
+    // Well inside the fifth decimal: the same journey as far as routing is concerned.
+    await getTrafficAwareCarTime({ ...pair, toLat: pair.toLat + 0.000001 });
+
+    expect(fetchTrafficAwareRoute).toHaveBeenCalledTimes(1);
+
+    // A different arrival time is a different question, and must not share the cache entry.
+    await getTrafficAwareCarTime({ ...pair, arriveBy: { time: '17:00' } });
+    expect(fetchTrafficAwareRoute).toHaveBeenCalledTimes(2);
   });
 });

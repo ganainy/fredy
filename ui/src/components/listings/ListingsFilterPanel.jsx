@@ -118,6 +118,7 @@ export default function ListingsFilterPanel({
           <Select.Option value="applied">{t('listings.filterStatusApplied')}</Select.Option>
           <Select.Option value="rejected">{t('listings.filterStatusRejected')}</Select.Option>
           <Select.Option value="accepted">{t('listings.filterStatusAccepted')}</Select.Option>
+          <Select.Option value="subscription_needed">{t('listings.filterStatusSubscriptionNeeded')}</Select.Option>
           <Select.Option value="none">{t('listings.filterStatusNone')}</Select.Option>
         </FilterSelect>
       </FilterGroup>

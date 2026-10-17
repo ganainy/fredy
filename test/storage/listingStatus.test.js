@@ -77,6 +77,12 @@ describe('listingsStorage.setListingStatus', () => {
     expect(calls.execute).toHaveLength(0);
   });
 
+  it('accepts subscription_needed', () => {
+    listingsStorage.setListingStatus('listing-4', 'subscription_needed');
+    const parsed = JSON.parse(calls.execute[0].params.status);
+    expect(parsed.status).toBe('subscription_needed');
+  });
+
   it('returns 0 when no id is supplied (no SQL is run)', () => {
     const result = listingsStorage.setListingStatus(null, 'applied');
     expect(result).toBe(0);

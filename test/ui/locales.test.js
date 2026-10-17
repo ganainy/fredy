@@ -173,6 +173,10 @@ const COMPUTED_KEYS = [
   ...['In', 'Ago'].flatMap((direction) =>
     ['Minutes', 'Hours', 'Day', 'Days'].map((unit) => `dashboard.time${direction}${unit}`),
   ),
+  // The apply-automation toast keys its error message by the reason `applyService.js` returned,
+  // which a static grep of the dialog's source cannot see. A fourth reason without an entry here
+  // would print the raw key into the toast instead of an explanation.
+  ...['unsupportedProvider', 'paywalled', 'launchFailed'].map((reason) => `listing.application.applyError.${reason}`),
 ];
 
 /**

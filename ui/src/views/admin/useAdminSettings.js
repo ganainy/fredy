@@ -57,6 +57,7 @@ export const ROUTING_FIELDS = [
   'travelTimeMaxAgeDays',
   'travelTimeMaxMinutes',
   'travelTimeStreetLookupsPerRun',
+  'googleMapsApiKey',
   'poiEnabled',
   'overpassBaseUrl',
   'poiLookupsPerRun',
@@ -132,6 +133,9 @@ function toForm(settings) {
     travelTimeMaxAgeDays: settings?.travelTimeMaxAgeDays ?? 30,
     travelTimeMaxMinutes: settings?.travelTimeMaxMinutes ?? 90,
     travelTimeStreetLookupsPerRun: settings?.travelTimeStreetLookupsPerRun ?? 15,
+    // Write-only, like proxyAuthSecret: the backend never sends it back, so the form always starts
+    // empty and an empty value on save means "keep the current key".
+    googleMapsApiKey: '',
     poiEnabled: settings?.poiEnabled !== false,
     overpassBaseUrl: settings?.overpassBaseUrl ?? '',
     poiLookupsPerRun: settings?.poiLookupsPerRun ?? 40,
@@ -257,6 +261,7 @@ export function useAdminSettings(settings) {
         }
         payload.motisBaseUrl = form.motisBaseUrl?.trim() ?? '';
         payload.overpassBaseUrl = form.overpassBaseUrl?.trim() ?? '';
+        payload.googleMapsApiKey = form.googleMapsApiKey?.trim() ?? '';
       }
       if (fields.includes('priceCheckIntervalDays')) {
         payload.priceCheckIntervalDays = Number(form.priceCheckIntervalDays);

@@ -21,9 +21,15 @@ const root = (await import('node:path')).resolve('.');
 const settingsStoragePath = root + '/lib/services/storage/settingsStorage.js';
 
 let stored;
+let resets;
 
 async function buildServer() {
   vi.resetModules();
+  vi.doMock(root + '/lib/services/storage/listingsStorage.js', () => ({
+    resetAllTravelTimes: () => {
+      resets += 1;
+    },
+  }));
   vi.doMock(settingsStoragePath, () => ({
     getSettings: async () => ({ demoMode: false }),
     getPublicSettings: async () => ({}),
@@ -44,6 +50,7 @@ async function buildServer() {
 const post = (app, payload) => app.inject({ method: 'POST', url: '/api/admin/generalSettings', payload });
 
 beforeEach(() => {
+  resets = 0;
   stored = {};
 });
 
@@ -141,6 +148,32 @@ describe('the routing endpoints', () => {
     const app = await buildServer();
 
     expect((await post(app, { motisBaseUrl: 'ftp://example.org/api' })).statusCode).toBe(400);
+  });
+});
+
+describe('the Google Maps API key', () => {
+  it('trims and stores a key', async () => {
+    const app = await buildServer();
+
+    const response = await post(app, { googleMapsApiKey: ' AIzaExample ' });
+
+    expect(response.statusCode).toBe(200);
+    expect(stored.googleMapsApiKey).toBe('AIzaExample');
+    // Stored travel times were measured without it, so they are all queued for re-measuring.
+    expect(resets).toBe(1);
+  });
+
+  it('drops an empty submission rather than clearing the stored key', async () => {
+    const app = await buildServer();
+
+    // Write-only, like proxyAuthSecret: the form always starts empty, so an empty value on save
+    // has to mean "I did not touch this", not "delete it".
+    const response = await post(app, { googleMapsApiKey: '', travelTimeMaxMinutes: 45 });
+
+    expect(response.statusCode).toBe(200);
+    expect(stored).not.toHaveProperty('googleMapsApiKey');
+    expect(resets).toBe(0);
+    expect(stored.travelTimeMaxMinutes).toBe(45);
   });
 });
 

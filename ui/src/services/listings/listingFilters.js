@@ -232,6 +232,7 @@ export function describeActiveFilters(values, { t, jobs = [], providers = [] }) 
         applied: t('listings.filterStatusApplied'),
         rejected: t('listings.filterStatusRejected'),
         accepted: t('listings.filterStatusAccepted'),
+        subscription_needed: t('listings.filterStatusSubscriptionNeeded'),
         none: t('listings.filterStatusNone'),
       })[values.status] ?? values.status,
     afford: () =>

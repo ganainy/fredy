@@ -61,3 +61,37 @@ export async function previewApplicationTemplate({ template, language, dealType 
   const response = await xhrPost('/api/user/settings/application-preview', { template, language, dealType });
   return response.json;
 }
+
+/**
+ * @typedef {Object} ApplyOutcome
+ * @property {true} ok
+ * @property {string} sessionId
+ * @property {string[]} filled
+ * @property {string[]} missing
+ */
+
+/**
+ * @typedef {{ok: false, reason: 'unsupportedProvider'|'paywalled'|'launchFailed'}} ApplyFailure
+ */
+
+/**
+ * Opens the real listing in a browser window the user can see and fills in its contact form.
+ *
+ * @param {string} listingId
+ * @returns {Promise<ApplyOutcome|ApplyFailure>}
+ */
+export async function startAutoApply(listingId) {
+  const response = await xhrPost(`/api/listings/${encodeURIComponent(listingId)}/apply`, {});
+  return response.json;
+}
+
+/**
+ * "Mark as sent": closes the browser window and records the listing as applied for.
+ *
+ * @param {string} listingId
+ * @param {string} sessionId
+ * @returns {Promise<void>}
+ */
+export async function confirmAutoApply(listingId, sessionId) {
+  await xhrPost(`/api/listings/${encodeURIComponent(listingId)}/apply/confirm`, { sessionId });
+}
