@@ -9,3 +9,11 @@ Reach Fredy from anywhere at your own hostname, without opening router ports.
 5. `docker compose up -d` starts Fredy, `docker compose --profile tunnel up -d` also starts the tunnel.
 
 Fredy listens only on `127.0.0.1:9998` on the host. Change the default `admin` password right after first login.
+
+## Updating
+
+`./deploy.sh` pulls (fast-forward only), builds, restarts Fredy and waits for the health check.
+If the new container is not healthy within `HEALTH_TIMEOUT` seconds (default 150) the previous
+image is restored automatically. `conf/` and `db/` are archived to `~/fredy-backups` first
+(last 5 kept). `./deploy.sh --no-pull` deploys the checkout as it is, `./deploy.sh --rollback`
+puts the previous image back. Rollback restores the image only, not database changes.
