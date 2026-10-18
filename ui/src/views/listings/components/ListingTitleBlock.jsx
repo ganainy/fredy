@@ -8,6 +8,7 @@ import { IconMapPin } from '@douyinfe/semi-icons';
 
 import AddressEditor from './AddressEditor.jsx';
 import StatusControl from '../../../components/listings/StatusControl.jsx';
+import SubscriptionBadge from '../../../components/listings/SubscriptionBadge.jsx';
 import { statusOptions } from '../../../components/listings/statusOptions.js';
 import * as timeService from '../../../services/time/timeService.js';
 import { useTranslation, useLocale } from '../../../services/i18n/i18n.jsx';
@@ -94,6 +95,14 @@ export default function ListingTitleBlock({ listing, wide, onSaveAddress, onPick
           )}
         </div>
       </div>
+
+      {/* Under the address row, above the listing's own content: a fact about applying for this flat,
+          which belongs with who the listing is rather than buried further down the page. */}
+      {listing?.requires_subscription === 1 && (
+        <div className="listing-title__subscription">
+          <SubscriptionBadge listing={listing} />
+        </div>
+      )}
     </header>
   );
 }

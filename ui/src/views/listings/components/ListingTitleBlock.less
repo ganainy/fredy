@@ -127,6 +127,12 @@
     color: @color-faint;
   }
 
+  // Left-aligned and only as wide as its chip: as a bare flex child it would stretch the full column
+  // and paint its border across the whole line.
+  &__subscription {
+    display: flex;
+  }
+
   @media (max-width: 1180px) {
     padding: @space-5 @space-4 0;
 

@@ -6,6 +6,7 @@
 import { useEffect, useMemo } from 'react';
 import { useSelector } from '../services/state/store';
 import { usesBrowserAdapter } from '../services/notifications/browserAdapter.js';
+import { subscribeJobEvents } from '../services/jobEvents.js';
 
 /**
  * Deliver browser notifications for jobs that are configured to send them.
@@ -39,8 +40,6 @@ export function useBrowserNotifications() {
   useEffect(() => {
     if (currentUser == null || Object.keys(currentUser).length === 0) return undefined;
 
-    const src = new EventSource('/api/jobs/events');
-
     const onBrowserNotification = (e) => {
       try {
         const data = JSON.parse(e.data || '{}');
@@ -61,14 +60,6 @@ export function useBrowserNotifications() {
       }
     };
 
-    src.addEventListener('notification:browser', onBrowserNotification);
-    src.onerror = () => {
-      // Browser automatically reconnects
-    };
-
-    return () => {
-      src.removeEventListener('notification:browser', onBrowserNotification);
-      src.close();
-    };
+    return subscribeJobEvents('notification:browser', onBrowserNotification);
   }, [currentUser?.userId]);
 }

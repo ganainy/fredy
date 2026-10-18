@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2026 by Christian Kellner.
+ * Licensed under Apache-2.0 with Commons Clause and Attribution/Naming Clause
+ */
+
+@import '../../tokens.less';
+
+// The same shape as the scam badge, in the palette the interface already uses to say "mind this,
+// but nothing is wrong": the orange tone of the KPI cards. Red stays reserved for fraud, so the two
+// warnings are never confused at a glance.
+.subscriptionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: @space-1;
+  height: 20px;
+  padding: 0 @space-2;
+  border-radius: @radius-chip;
+  font-size: @text-xs;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: @color-orange-text;
+
+  .semi-icon {
+    font-size: 11px;
+  }
+
+  // On a surface: the word carries the colour, the panel is the application's own elevated one and
+  // is stated rather than inherited, so a hovered row cannot shift the contrast underneath it.
+  &--inline {
+    background: @color-elevated;
+    border: 1px solid @color-orange-border;
+  }
+
+  // Over a photograph: @color-orange-bg is a translucent wash and would let the picture through, so
+  // the chip borrows the opaque panel the card overlays already use.
+  &--onImage {
+    position: absolute;
+    top: @space-2;
+    left: @space-2;
+    background: @color-map-panel;
+    border: 1px solid @color-orange-border;
+  }
+}

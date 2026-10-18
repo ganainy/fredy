@@ -20,6 +20,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import ListingDeletionModal from '../ListingDeletionModal.jsx';
 import ApplicationModal from '../../views/listings/components/ApplicationModal.jsx';
 import { xhrDelete, xhrPost, errorMessage } from '../../services/xhr.js';
+import { subscribeJobEvents } from '../../services/jobEvents.js';
 import { useActions, useSelector } from '../../services/state/store.js';
 import { debounce, measuredPlaces } from '../../utils';
 import FilterSelect from './FilterSelect.jsx';
@@ -188,8 +189,6 @@ const ListingsOverview = () => {
 
   // SSE connection for live listings updates
   useEffect(() => {
-    const src = new EventSource('/api/jobs/events');
-
     const onNewListings = (e) => {
       try {
         const data = JSON.parse(e.data || '{}');
@@ -201,19 +200,7 @@ const ListingsOverview = () => {
       }
     };
 
-    src.addEventListener('listings:new', onNewListings);
-    src.onerror = () => {
-      // Let browser auto-reconnect
-    };
-
-    return () => {
-      try {
-        src.removeEventListener('listings:new', onNewListings);
-        src.close();
-      } catch {
-        // noop
-      }
-    };
+    return subscribeJobEvents('listings:new', onNewListings);
   }, [t]);
 
   const handleFilterChange = useMemo(

@@ -6,11 +6,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Modal, Button, Select, Space, Spin, Tag, TextArea, Toast, Typography } from '@douyinfe/semi-ui-19';
-import { IconCopy, IconSend } from '@douyinfe/semi-icons';
+import { IconCopy } from '@douyinfe/semi-icons';
 import { useTranslation } from '../../../services/i18n/i18n.jsx';
 import { useActions } from '../../../services/state/store.js';
 import { errorMessage } from '../../../services/xhr.js';
-import { fetchApplicationLetter, startAutoApply, confirmAutoApply } from '../../../services/applicationClient.js';
+import { fetchApplicationLetter } from '../../../services/applicationClient.js';
 import { copyToClipboard } from '../../../services/clipboard.js';
 import {
   LETTER_LANGUAGE_FLAG,
@@ -50,10 +50,6 @@ export default function ApplicationModal({ visible, listingId, onCancel, onAppli
   const [letter, setLetter] = useState(null);
   const [text, setText] = useState('');
   const [copying, setCopying] = useState(false);
-  /** The apply-automation browser window, once "Apply automatically" has opened one. */
-  const [applySessionId, setApplySessionId] = useState(null);
-  const [applying, setApplying] = useState(false);
-  const [confirming, setConfirming] = useState(false);
   /**
    * The language the user picked, or null while the portal's country still decides.
    *
@@ -106,56 +102,9 @@ export default function ApplicationModal({ visible, listingId, onCancel, onAppli
 
   // A language picked for one listing is not a statement about the next one, so the override goes
   // back to "whatever the portal's country says" whenever the dialog moves to another listing.
-  // A session belongs to the listing it opened a browser window for; carrying it over to the next
-  // one would show "Mark as sent" for a window that was never opened on this flat.
   useEffect(() => {
     setLanguage(null);
-    setApplySessionId(null);
   }, [listingId]);
-
-  /**
-   * Opens the real listing in a browser window the user can see and fills in its contact form.
-   */
-  const handleApply = async () => {
-    setApplying(true);
-    try {
-      const outcome = await startAutoApply(listingId);
-      if (!outcome.ok) {
-        Toast.error(t(`listing.application.applyError.${outcome.reason}`));
-        return;
-      }
-      setApplySessionId(outcome.sessionId);
-      Toast.success(
-        outcome.missing.length > 0
-          ? t('listing.application.applyOpenedWithGaps', { count: outcome.missing.length })
-          : t('listing.application.applyOpened'),
-      );
-    } catch (exception) {
-      console.error('Error starting apply automation.', exception);
-      Toast.error(errorMessage(exception, t('listing.application.applyError.launchFailed')));
-    } finally {
-      setApplying(false);
-    }
-  };
-
-  /**
-   * "Mark as sent": closes the browser window and records the listing as applied for.
-   */
-  const handleConfirmSent = async () => {
-    setConfirming(true);
-    try {
-      await confirmAutoApply(listingId, applySessionId);
-      setApplySessionId(null);
-      onApplied?.();
-      Toast.success(t('listing.application.markedSent'));
-      onCancel();
-    } catch (exception) {
-      console.error('Error confirming apply automation.', exception);
-      Toast.error(errorMessage(exception, t('listing.application.markFailed')));
-    } finally {
-      setConfirming(false);
-    }
-  };
 
   /**
    * Copy the letter, then record that this listing has been applied for.
@@ -200,21 +149,6 @@ export default function ApplicationModal({ visible, listingId, onCancel, onAppli
   const footer = (
     <div className="applicationModal__footer">
       <Button onClick={onCancel}>{t('listing.application.close')}</Button>
-      {letter?.canAutoApply &&
-        (applySessionId == null ? (
-          <Button
-            icon={<IconSend />}
-            loading={applying}
-            disabled={loading || applying || text.length === 0}
-            onClick={handleApply}
-          >
-            {t('listing.application.applyAutomatically')}
-          </Button>
-        ) : (
-          <Button theme="solid" type="primary" loading={confirming} disabled={confirming} onClick={handleConfirmSent}>
-            {t('listing.application.markAsSent')}
-          </Button>
-        ))}
       <Button
         theme="solid"
         type="primary"
@@ -252,12 +186,6 @@ export default function ApplicationModal({ visible, listingId, onCancel, onAppli
 
       {!loading && error == null && letter != null && (
         <>
-          {applySessionId != null && (
-            <div className="applicationModal__callout">
-              <Text>{t('listing.application.applySessionOpen')}</Text>
-            </div>
-          )}
-
           <Space wrap className="applicationModal__meta">
             {/* The portal's country picks the language, and the picker starts on that answer - but
                 the portal is not always right about who reads the letter, and an Italian listing

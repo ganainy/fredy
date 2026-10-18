@@ -4,11 +4,19 @@
  */
 
 import { Tooltip } from '@douyinfe/semi-ui-19';
-import { IconChevronDown, IconChevronUp, IconExpand, IconGridView, IconHelpCircle } from '@douyinfe/semi-icons';
+import {
+  IconChevronDown,
+  IconChevronUp,
+  IconClock,
+  IconExpand,
+  IconGridView,
+  IconHelpCircle,
+} from '@douyinfe/semi-icons';
 
 import IconEuro from '../../../components/icons/IconEuro.jsx';
 import { describeBenchmark } from '../../../components/listings/PricePerSqmBadge.jsx';
 import PriceHistoryChart from './PriceHistoryChart.jsx';
+import TravelTimes from '../../../components/transit/TravelTimes.jsx';
 import { buildObjectFacts } from '../listingFacts.js';
 import { formatDeviation } from '../../../services/listings/marketBenchmark.js';
 import { VERDICT_COLORS, formatEuro, withAlpha } from '../../../components/cards/chartTheme.js';
@@ -73,9 +81,11 @@ function MarketPill({ benchmark }) {
  * @param {Object} props.listing
  * @param {Array<Object>} props.priceHistory - Readings as the API returns them.
  * @param {Object} [props.financeThresholds] - As `useFinanceProfile` returns them.
+ * @param {(entries: Array<Object>) => void} [props.onTravelTimesLoaded] - Receives the routed travel
+ *   times, which the location map draws its routes from.
  * @returns {React.ReactElement}
  */
-export default function ListingKeyFacts({ listing, priceHistory, financeThresholds }) {
+export default function ListingKeyFacts({ listing, priceHistory, financeThresholds, onTravelTimesLoaded }) {
   const t = useTranslation();
   const locale = useLocale();
   const na = t('common.na');
@@ -135,6 +145,18 @@ export default function ListingKeyFacts({ listing, priceHistory, financeThreshol
           </div>
         ))}
       </div>
+
+      {/* How long it takes to get from the saved addresses to here, next to the price and size it is
+          weighed against. It loads on its own: a listing found minutes ago has not been routed yet. */}
+      {listing?.latitude != null && listing?.longitude != null && (
+        <div className="listing-keyfacts__travel">
+          <span className="listing-keyfacts__travel-title">
+            <IconClock aria-hidden="true" />
+            {t('travelTime.title')}
+          </span>
+          <TravelTimes listingId={listing.id} travelTimes={listing.travelTimes} refine onLoaded={onTravelTimesLoaded} />
+        </div>
+      )}
 
       {/* Directly under the figures it explains. Hidden below two readings, so a listing whose
           price has never moved shows nothing at all rather than an empty frame. */}

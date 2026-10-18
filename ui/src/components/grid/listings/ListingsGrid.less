@@ -113,6 +113,12 @@
     font-variant-numeric: tabular-nums;
   }
 
+  // The lock chip sits on its own line under the price. The wrapper keeps it from stretching to the
+  // card's width the way a bare flex child would, so the chip stays the size of its word.
+  &__subscription {
+    display: flex;
+  }
+
   &__meta {
     font-size: @text-xs;
     color: @color-muted;

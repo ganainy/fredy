@@ -38,6 +38,7 @@ import {
 import { useUrlState, parseNumber, parseString, parseNullableBoolean } from '../../../hooks/useSearchParamState.js';
 import { useActions, useSelector } from '../../../services/state/store.js';
 import { xhrDelete, xhrPut, xhrPost, errorMessage } from '../../../services/xhr.js';
+import { subscribeJobEvents } from '../../../services/jobEvents.js';
 import { debounce } from '../../../utils';
 import { IllustrationNoResult, IllustrationNoResultDark } from '@douyinfe/semi-illustrations';
 import JobsTable from '../../table/JobsTable.jsx';
@@ -95,7 +96,6 @@ const JobGrid = () => {
   const activeFilterCount = countActiveFilters(filterValues);
 
   const pendingJobIdRef = useRef(null);
-  const evtSourceRef = useRef(null);
 
   const loadData = () => {
     actions.jobsData.getJobsData({
@@ -130,10 +130,6 @@ const JobGrid = () => {
 
   // SSE connection for live job status updates
   useEffect(() => {
-    // establish SSE connection
-    const src = new EventSource('/api/jobs/events');
-    evtSourceRef.current = src;
-
     const onJobStatus = (e) => {
       try {
         const data = JSON.parse(e.data || '{}');
@@ -156,19 +152,10 @@ const JobGrid = () => {
       }
     };
 
-    src.addEventListener('jobStatus', onJobStatus);
-    src.onerror = () => {
-      // Let browser auto-reconnect
-    };
+    const unsubscribe = subscribeJobEvents('jobStatus', onJobStatus);
 
     return () => {
-      try {
-        src.removeEventListener('jobStatus', onJobStatus);
-        src.close();
-      } catch {
-        //noop
-      }
-      evtSourceRef.current = null;
+      unsubscribe();
       pendingJobIdRef.current = null;
     };
   }, [actions.jobsData]);

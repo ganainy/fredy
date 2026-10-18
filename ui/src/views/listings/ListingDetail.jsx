@@ -30,6 +30,7 @@ import ConnectivityCard from '../../components/connectivity/ConnectivityCard.jsx
 import ListingActionBar from './components/ListingActionBar.jsx';
 import ListingTitleBlock from './components/ListingTitleBlock.jsx';
 import ListingKeyFacts from './components/ListingKeyFacts.jsx';
+import { answeredModes, ROUTE_MODE_ORDER } from '../../components/transit/travelTimeFormat.js';
 import ListingOrigin from './components/ListingOrigin.jsx';
 import ListingLocationCard from './components/ListingLocationCard.jsx';
 import ListingWorkspace from './components/ListingWorkspace.jsx';
@@ -126,9 +127,17 @@ export default function ListingDetail() {
   // route that comes in the same answer. Seeded from the listing so a stored route is drawn without
   // waiting for the request that only refines it.
   const [routeTimes, setRouteTimes] = useState(listing?.travelTimes ?? []);
-  // Which route the map draws. Straight line to begin with, because that is the one that needs
-  // nothing fetched and so is never missing.
-  const [routeMode, setRouteMode] = useState('straight');
+  // Which route the map draws, once the reader has picked one. Until then it opens on the first mode
+  // anything was measured in, car before public transport, so the map starts on a real route. The
+  // straight line is the last resort when nothing has been measured.
+  const [pickedRouteMode, setRouteMode] = useState(null);
+  const routeMode = useMemo(() => {
+    if (pickedRouteMode != null) return pickedRouteMode;
+    const answered = answeredModes(routeTimes);
+    const first = ROUTE_MODE_ORDER.find((key) => answered.has(key));
+    if (first != null) return first;
+    return 'straight';
+  }, [pickedRouteMode, routeTimes]);
   // Everything the map draws a pin and a line for. A saved address is a fixed point and the same one
   // for every listing; a place type has no point of its own, so the supermarket it actually resolved
   // to comes from this listing's own travel times, which is where the sweep recorded it.
@@ -137,6 +146,10 @@ export default function ListingDetail() {
   useEffect(() => {
     setRouteTimes(listing?.travelTimes ?? []);
   }, [listing?.id, listing?.travelTimes]);
+
+  useEffect(() => {
+    setRouteMode(null);
+  }, [listing?.id]);
 
   useEffect(() => {
     document.querySelector('.app__content')?.scrollTo({ top: 0 });
@@ -501,6 +514,7 @@ export default function ListingDetail() {
         onBack={() => navigate(-1)}
         onWatch={handleWatch}
         onApply={() => setApplicationVisible(true)}
+        onApplied={() => actions.listingsData.getListing(listingId)}
         onDelete={requestDeletion}
         onReactivate={handleReactivate}
       />
@@ -561,7 +575,6 @@ export default function ListingDetail() {
               routeMode={routeMode}
               onRouteModeChange={setRouteMode}
               routeTimes={routeTimes}
-              onTravelTimesLoaded={setRouteTimes}
               lagecheckHref={lagecheckHref}
               onLagecheckOpen={() => actions.tracking.trackPoi(pois.LAGECHECK_OPENED)}
             />
@@ -587,7 +600,12 @@ export default function ListingDetail() {
 
         <aside className="listing-detail__rail">
           <div className="listing-detail__sec--keyfacts">
-            <ListingKeyFacts listing={listing} priceHistory={priceHistory} financeThresholds={financeThresholds} />
+            <ListingKeyFacts
+              listing={listing}
+              priceHistory={priceHistory}
+              financeThresholds={financeThresholds}
+              onTravelTimesLoaded={setRouteTimes}
+            />
           </div>
 
           <div className="listing-detail__sec--origin">

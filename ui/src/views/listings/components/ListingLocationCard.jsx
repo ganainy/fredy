@@ -4,15 +4,17 @@
  */
 
 import { Banner, Button, RadioGroup, Radio, Typography } from '@douyinfe/semi-ui-19';
-import { IconClock, IconShield } from '@douyinfe/semi-icons';
+import { IconShield } from '@douyinfe/semi-icons';
 
 import MapCanvas from '../../../components/map/Map.jsx';
-import TravelTimes from '../../../components/transit/TravelTimes.jsx';
-import { answeredModes, TRAVEL_MODES } from '../../../components/transit/travelTimeFormat.js';
+import { answeredModes, ROUTE_MODE_ORDER, TRAVEL_MODES } from '../../../components/transit/travelTimeFormat.js';
 import { useTranslation } from '../../../services/i18n/i18n.jsx';
 import './ListingLocationCard.less';
 
 const { Text } = Typography;
+
+/** The modes in the order the picker offers them: driving first, then public transport. */
+const ROUTE_MODES = ROUTE_MODE_ORDER.map((key) => TRAVEL_MODES.find((mode) => mode.key === key));
 
 /**
  * Whether any address has a drawable route in this mode.
@@ -62,7 +64,6 @@ export function hasRouteFor(travelTimes, mode) {
  * @param {string} props.routeMode
  * @param {(mode: string) => void} props.onRouteModeChange
  * @param {Array<Object>} props.routeTimes
- * @param {(entries: Array<Object>) => void} props.onTravelTimesLoaded
  * @param {string|null} props.lagecheckHref
  * @param {() => void} props.onLagecheckOpen
  * @returns {React.ReactElement}
@@ -87,7 +88,6 @@ export default function ListingLocationCard({
   routeMode,
   onRouteModeChange,
   routeTimes,
-  onTravelTimesLoaded,
   lagecheckHref,
   onLagecheckOpen,
 }) {
@@ -113,8 +113,7 @@ export default function ListingLocationCard({
               onChange={(event) => onRouteModeChange(event.target.value)}
               aria-label={t('listing.detail.routeLabel')}
             >
-              <Radio value="straight">{t('listing.detail.routeStraight')}</Radio>
-              {TRAVEL_MODES.map((mode) => (
+              {ROUTE_MODES.map((mode) => (
                 <Radio key={mode.key} value={mode.key} disabled={!answered.has(mode.key)}>
                   {/* The reason, on the button itself - disabled with no explanation is what makes
                       an interface feel broken rather than honest. On the label rather than on the
@@ -125,6 +124,8 @@ export default function ListingLocationCard({
                   </span>
                 </Radio>
               ))}
+              {/* Last: it is what is left when no route fits, not the answer anybody comes for. */}
+              <Radio value="straight">{t('listing.detail.routeStraight')}</Radio>
             </RadioGroup>
             {/* Only for a mode that was measured and still has no line to show: an estimate worked
                 out from the nearest stop, say. Saying it about a mode with no answer at all would
@@ -221,41 +222,6 @@ export default function ListingLocationCard({
           >
             {t('lagecheck.link')}
           </a>
-        </div>
-      )}
-
-      {/* Straight-line distances to the saved addresses. Kept directly above the travel times
-          because the two answer the same question and the second one is the honest answer. */}
-      {Array.isArray(listing?.distances) && listing.distances.length > 0 && (
-        <div className="listing-location__row">
-          <div className="listing-location__row-body">
-            <span className="listing-location__row-title">{t('listing.detail.distanceToHome')}</span>
-            <span className="listing-location__distances">
-              {listing.distances.map((distance) => (
-                <span key={distance.label} className="listing-location__distance">
-                  {distance.label}: {distance.meters} m
-                </span>
-              ))}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* The honest answer to the question the straight-line distance only approximates. It loads
-          on its own: a listing found minutes ago has not been routed yet, and this is where
-          somebody would look. */}
-      {hasCoordinates && (
-        <div className="listing-location__row">
-          <IconClock className="listing-location__row-icon" aria-hidden="true" />
-          <div className="listing-location__row-body listing-location__row-body--inline">
-            <span className="listing-location__row-title">{t('travelTime.title')}</span>
-            <TravelTimes
-              listingId={listing.id}
-              travelTimes={listing.travelTimes}
-              refine
-              onLoaded={onTravelTimesLoaded}
-            />
-          </div>
         </div>
       )}
 

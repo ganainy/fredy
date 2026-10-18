@@ -136,6 +136,8 @@ function toForm(settings) {
     // Write-only, like proxyAuthSecret: the backend never sends it back, so the form always starts
     // empty and an empty value on save means "keep the current key".
     googleMapsApiKey: '',
+    // Read-only: whether the backend holds a key, since it never sends the key itself.
+    googleMapsApiKeyConfigured: settings?.googleMapsApiKeyConfigured === true,
     poiEnabled: settings?.poiEnabled !== false,
     overpassBaseUrl: settings?.overpassBaseUrl ?? '',
     poiLookupsPerRun: settings?.poiLookupsPerRun ?? 40,

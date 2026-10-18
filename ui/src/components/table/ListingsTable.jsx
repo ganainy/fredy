@@ -4,6 +4,7 @@
  */
 
 import { Link } from 'react-router';
+import { openInNewTab } from '../listings/openInNewTab.js';
 import { IconMapPin } from '@douyinfe/semi-icons';
 import no_image from '../../assets/no_image.png';
 import { listingPictureSrc } from '../../services/listings/listingPictures.js';
@@ -15,6 +16,7 @@ import { rentIncludesCharges } from '../../services/finance/rentBasis.js';
 import PriceChangeBadge from '../listings/PriceChangeBadge.jsx';
 import PricePerSqmBadge from '../listings/PricePerSqmBadge.jsx';
 import ScamBadge from '../listings/ScamBadge.jsx';
+import SubscriptionBadge from '../listings/SubscriptionBadge.jsx';
 import WatchToggle from '../listings/WatchToggle.jsx';
 import ListingActions from '../listings/ListingActions.jsx';
 import CommuteBadge from '../transit/CommuteBadge.jsx';
@@ -65,7 +67,21 @@ const ListingsTable = ({
           key={item.id}
           className="listingsTable__row"
           onClick={(event) => {
-            if (event.target.closest('a') == null) onNavigate(item.id);
+            if (event.target.closest('a') != null) return;
+            // Ctrl/Cmd-click opens a new tab like a link would and leaves this one where it is.
+            if (event.ctrlKey || event.metaKey) {
+              if (!isHiddenView) openInNewTab(`/listings/listing/${item.id}`);
+              return;
+            }
+            onNavigate(item.id);
+          }}
+          // Windows starts autoscroll on a middle press; stop it so the release can open the tab.
+          onMouseDown={(event) => {
+            if (event.button === 1 && event.target.closest('a') == null) event.preventDefault();
+          }}
+          onAuxClick={(event) => {
+            if (event.button !== 1 || event.target.closest('a') != null || isHiddenView) return;
+            openInNewTab(`/listings/listing/${item.id}`);
           }}
         >
           <div className="listingsTable__row__thumb">
@@ -90,9 +106,13 @@ const ListingsTable = ({
             )}
             {/* Under the headline rather than in front of it. In front, the badge had to give up
                 its word to leave room for the title, and a warning without a word is a shape. */}
-            {(!item.is_active || item.scam_signals?.length > 0 || item.scam_override != null) && (
+            {(!item.is_active ||
+              item.scam_signals?.length > 0 ||
+              item.scam_override != null ||
+              item.requires_subscription === 1) && (
               <div className="listingsTable__row__flags">
                 <ScamBadge listing={item} />
+                <SubscriptionBadge listing={item} />
                 {!item.is_active && <span className="listingsTable__row__inactive">{t('listings.cardInactive')}</span>}
               </div>
             )}

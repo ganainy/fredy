@@ -18,6 +18,13 @@ export const TRAVEL_MODES = [
 ];
 
 /**
+ * The order modes are offered and defaulted in on the listing page: driving first, then public
+ * transport. Kept apart from {@link TRAVEL_MODES}, whose order other lists and fallbacks rely on.
+ * @type {string[]}
+ */
+export const ROUTE_MODE_ORDER = ['car', 'transit', 'bike', 'walk'];
+
+/**
  * The ceilings offered per mode, for the "reachable within" filters.
  *
  * Deliberately different per mode: an hour on a train is an ordinary commute, an hour on foot is

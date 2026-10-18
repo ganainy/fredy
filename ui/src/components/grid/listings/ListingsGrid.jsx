@@ -4,6 +4,7 @@
  */
 
 import { Link } from 'react-router';
+import { openInNewTab } from '../../listings/openInNewTab.js';
 import { IconBriefcase, IconMapPin, IconPaperclip } from '@douyinfe/semi-icons';
 import no_image from '../../../assets/no_image.png';
 import { listingPictureSrc } from '../../../services/listings/listingPictures.js';
@@ -15,6 +16,7 @@ import { rentIncludesCharges } from '../../../services/finance/rentBasis.js';
 import PriceChangeBadge from '../../listings/PriceChangeBadge.jsx';
 import PricePerSqmBadge from '../../listings/PricePerSqmBadge.jsx';
 import ScamBadge from '../../listings/ScamBadge.jsx';
+import SubscriptionBadge from '../../listings/SubscriptionBadge.jsx';
 import WatchToggle from '../../listings/WatchToggle.jsx';
 import ListingActions from '../../listings/ListingActions.jsx';
 import CommuteBadge from '../../transit/CommuteBadge.jsx';
@@ -52,7 +54,21 @@ const ListingsGrid = ({
           key={item.id}
           className="listingsGrid__card"
           onClick={(event) => {
-            if (event.target.closest('a') == null) onNavigate(item.id);
+            if (event.target.closest('a') != null) return;
+            // Ctrl/Cmd-click opens a new tab like a link would and leaves this one where it is.
+            if (event.ctrlKey || event.metaKey) {
+              if (!isHiddenView) openInNewTab(`/listings/listing/${item.id}`);
+              return;
+            }
+            onNavigate(item.id);
+          }}
+          // Windows starts autoscroll on a middle press; stop it so the release can open the tab.
+          onMouseDown={(event) => {
+            if (event.button === 1 && event.target.closest('a') == null) event.preventDefault();
+          }}
+          onAuxClick={(event) => {
+            if (event.button !== 1 || event.target.closest('a') != null || isHiddenView) return;
+            openInNewTab(`/listings/listing/${item.id}`);
           }}
         >
           <div className="listingsGrid__card__image-wrapper">
@@ -99,6 +115,15 @@ const ListingsGrid = ({
                   previousPrice={item.previous_price}
                   changedAt={item.price_changed_at}
                 />
+              </div>
+            )}
+
+            {/* Under the price: it is about getting the flat at all, which is what the price and the
+                headline above it are about, not a footnote of the card. Renders nothing for the
+                listings the probe found contactable, so the row stays as it was. */}
+            {item.requires_subscription === 1 && (
+              <div className="listingsGrid__card__subscription">
+                <SubscriptionBadge listing={item} />
               </div>
             )}
 

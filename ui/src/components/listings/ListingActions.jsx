@@ -4,10 +4,11 @@
  */
 
 import { Button, Dropdown, Tooltip } from '@douyinfe/semi-ui-19';
-import { IconCopy, IconDelete, IconMore, IconRefresh } from '@douyinfe/semi-icons';
+import { IconCopy, IconDelete, IconEdit, IconMore, IconRefresh } from '@douyinfe/semi-icons';
 
 import ExternalListingLink from './ExternalListingLink.jsx';
 import { useTranslation } from '../../services/i18n/i18n.jsx';
+import { useCopyApplication } from './useCopyApplication.js';
 
 import './ListingActions.less';
 
@@ -47,6 +48,7 @@ export default function ListingActions({
   onDelete,
 }) {
   const t = useTranslation();
+  const { copy, copying } = useCopyApplication();
 
   // Only offered where it can do something: the alive-checker marked this one gone, and the user
   // is presumably looking at the ad that says otherwise. Not in the hidden view, where the row is
@@ -85,25 +87,49 @@ export default function ListingActions({
           listing you have just thrown away is noise. */}
       {!isHiddenView &&
         (density === 'card' ? (
-          <Button
-            className="listingActions__apply"
-            theme="outline"
-            size="small"
-            icon={<IconCopy />}
-            onClick={() => onApplication?.(listing)}
-          >
-            {t('listings.tooltipApplication')}
-          </Button>
-        ) : (
-          <Tooltip content={t('listings.tooltipApplication')}>
+          <>
             <Button
               className="listingActions__apply"
+              theme="outline"
               size="small"
               icon={<IconCopy />}
-              aria-label={t('listings.tooltipApplication')}
+              loading={copying}
+              onClick={() => copy(listing.id)}
+            >
+              {t('listings.tooltipApplication')}
+            </Button>
+            <Button
+              className="listingActions__apply"
+              theme="outline"
+              size="small"
+              icon={<IconEdit />}
               onClick={() => onApplication?.(listing)}
-            />
-          </Tooltip>
+            >
+              {t('listings.tooltipApplicationEdit')}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Tooltip content={t('listings.tooltipApplication')}>
+              <Button
+                className="listingActions__apply"
+                size="small"
+                icon={<IconCopy />}
+                loading={copying}
+                aria-label={t('listings.tooltipApplication')}
+                onClick={() => copy(listing.id)}
+              />
+            </Tooltip>
+            <Tooltip content={t('listings.tooltipApplicationEdit')}>
+              <Button
+                className="listingActions__apply"
+                size="small"
+                icon={<IconEdit />}
+                aria-label={t('listings.tooltipApplicationEdit')}
+                onClick={() => onApplication?.(listing)}
+              />
+            </Tooltip>
+          </>
         ))}
 
       {/* clickToHide, because Semi's Dropdown does not close itself: without it the menu stayed

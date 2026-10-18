@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Checkbox, Input, InputNumber, Progress } from '@douyinfe/semi-ui-19';
+import { Checkbox, Input, InputNumber, Progress, Tag } from '@douyinfe/semi-ui-19';
 import { useOutletContext } from 'react-router';
 
 import { SegmentPart } from '../../../components/segment/SegmentPart';
@@ -139,13 +139,28 @@ export default function RoutingPage() {
           help={t('settings.googleMapsApiKeyHelp')}
           htmlFor="googleMapsApiKey"
         >
+          {/* The field is write-only, so empty looks the same with and without a saved key. Say which. */}
+          <Tag
+            color={form.googleMapsApiKeyConfigured ? 'green' : 'grey'}
+            type="light"
+            className="settingsShell__secretStatus"
+            data-testid="googleMapsApiKeyStatus"
+          >
+            {form.googleMapsApiKeyConfigured
+              ? t('settings.googleMapsApiKeyConfigured')
+              : t('settings.googleMapsApiKeyMissing')}
+          </Tag>
           <Input
             id="googleMapsApiKey"
             type="password"
             mode="password"
             autoComplete="new-password"
             value={form.googleMapsApiKey}
-            placeholder={t('settings.googleMapsApiKeyPlaceholder')}
+            placeholder={
+              form.googleMapsApiKeyConfigured
+                ? t('settings.googleMapsApiKeyPlaceholderSaved')
+                : t('settings.googleMapsApiKeyPlaceholderEmpty')
+            }
             onChange={(value) => setField('googleMapsApiKey', value)}
           />
         </AdminField>

@@ -158,12 +158,17 @@ describe('listing detail layout', () => {
     expect(location).toContain('MapCanvas');
     expect(location).toContain('TRAVEL_MODES');
     expect(location).toContain('lagecheckHref');
-    expect(location).toContain('TravelTimes');
 
-    // None of the four may drift back into the page container, which is how they ended up in
+    // None of these may drift back into the page container, which is how they ended up in
     // different columns in the first place.
     expect(detail).not.toContain('<MapCanvas');
     expect(detail).not.toContain('<TravelTimes');
+  });
+
+  it('shows the travel times beside the price and size, not under the map', () => {
+    // They are weighed against what the flat costs and how big it is, so they sit in that card.
+    expect(source('components/ListingKeyFacts.jsx')).toContain('<TravelTimes');
+    expect(source('components/ListingLocationCard.jsx')).not.toContain('<TravelTimes');
   });
 });
 
