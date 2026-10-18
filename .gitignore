@@ -11,3 +11,5 @@ tools/release/config.json
 graft/
 
 db/apply-browser-profile/
+
+.env
