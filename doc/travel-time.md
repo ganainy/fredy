@@ -69,6 +69,27 @@ The marker popup on the map and the listing detail page both show the **three ne
 their walking distance. Each opens the same departure board, so "how do I get to work from here" is
 answered without leaving the listing.
 
+## Routing provider: Transitous or Google
+
+Under **Admin → Routing** you choose which service works out travel times.
+
+- **Transitous** (default): free, community-run. Public transport is estimated from the stops
+  around each address, car and walking come from street routing.
+- **Google Maps Route API**: needs a Google Maps API key (saved on the same page, write-only). For
+  every listing and every address in public transport or car mode, Fredy asks Google for the
+  journey from the listing to the address, **arriving by the time of day set on the address** on
+  the next working day. Public transport uses Google's arrival-time routing; a car has no
+  arrive-by mode, so it leaves 30 minutes earlier with traffic modelled in. Transitous still
+  answers walking and bike, and any lookup Google cannot answer (rate limit, no route, monthly
+  limit reached).
+
+Google bills the Routes API per request beyond its free monthly allowance. Fredy therefore counts
+the requests it sends and stops at **Google lookups per month** (default 5000; set it to your free
+allowance, check Google Cloud pricing and set a budget alert). The page shows the count used this
+month. Answers are cached for 24 hours per listing, address and time. Switching provider or saving a
+key re-measures every listing. With Google the public transport figure is a time only: the leg-by-leg
+journey and the drawn route are not shown for it.
+
 ## For operators
 
 Defaults that normally need no change:

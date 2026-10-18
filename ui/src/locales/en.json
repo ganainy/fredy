@@ -1333,7 +1333,7 @@
   "settings.motisBaseUrl": "Routing endpoint",
   "settings.motisBaseUrlHelp": "The service that works out the connections. Leave empty for the public Transitous instance; anyone pushing its limits points this at their own MOTIS instance.",
   "settings.googleMapsApiKey": "Google Maps API key",
-  "settings.googleMapsApiKeyHelp": "Only needed for the traffic-aware car time, switched on per address under Travel time. MOTIS never models traffic; Google's Routes API does, and has a free monthly tier, but usage beyond it is billed to this key. Leave empty to keep the car time as it is. A saved key is never shown again.",
+  "settings.googleMapsApiKeyHelp": "Needed when Google Maps Route API is chosen as the routing provider above (public transport and car with traffic), and for the per-address traffic-aware car option with Transitous. The key is write-only and never shown again.",
   "settings.googleMapsApiKeyPlaceholder": "Leave empty to keep the current key",
   "settings.googleMapsApiKeyConfigured": "A key is saved",
   "settings.googleMapsApiKeyMissing": "No key saved",
@@ -1584,5 +1584,13 @@
   "tour.step.listingTransit.title": "Public transport nearby",
   "tour.step.listingTransit.body": "The closest stops and their next departures. Nothing to set up: Fredy shows them for every listing with an address. Click a stop to see where its trains and buses go.",
   "tour.step.listingConnectivity.title": "Internet and mobile coverage",
-  "tour.step.listingConnectivity.body": "How fast the internet at the address can be and how good mobile reception is, taken from the official broadband registers.\n\nAn administrator switches this on under {{section}} › {{tab}}. After that Fredy fills it in for every listing in the background."
+  "tour.step.listingConnectivity.body": "How fast the internet at the address can be and how good mobile reception is, taken from the official broadband registers.\n\nAn administrator switches this on under {{section}} › {{tab}}. After that Fredy fills it in for every listing in the background.",
+  "settings.routingProvider": "Routing provider",
+  "settings.routingProviderHelp": "Which service works out travel times. Transitous is free and community-run. Google Maps Route API answers public transport and car (with traffic) for every listing, to each address at its set time of arrival, and is billed per request by Google beyond its free tier.",
+  "settings.routingProviderTransitous": "Transitous (free, community service)",
+  "settings.routingProviderGoogle": "Google Maps Route API",
+  "settings.routingProviderGoogleNeedsKey": "Save a Google Maps API key below before choosing Google.",
+  "settings.googleRoutesMonthlyLimit": "Google lookups per month",
+  "settings.googleRoutesMonthlyLimitHelp": "Fredy stops asking Google once this many requests have been sent in a calendar month and falls back to Transitous. Set it to your free allowance; check Google Cloud pricing and set a budget alert.",
+  "settings.googleRoutesUsage": "Used this month: {count} of {limit}"
 }
