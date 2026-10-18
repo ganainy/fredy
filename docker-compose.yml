@@ -11,7 +11,8 @@ services:
       - ./conf:/conf
       - ./db:/db
     ports:
-      - "9998:9998"
+      # Only reachable from this machine; public access goes through the cloudflared service below.
+      - "127.0.0.1:9998:9998"
     restart: unless-stopped
     # Resource limits to prevent runaway memory usage from Chromium
     deploy:
@@ -24,3 +25,18 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  # Cloudflare Tunnel: exposes Fredy at your own hostname without opening router ports.
+  # Start with:  docker compose --profile tunnel up -d
+  # Needs TUNNEL_TOKEN in .env (see .env.example). In the Cloudflare dashboard set the
+  # public hostname's service to  http://fredy:9998
+  cloudflared:
+    profiles: ["tunnel"]
+    container_name: fredy-cloudflared
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN:-}
+    depends_on:
+      - fredy
+    restart: unless-stopped
