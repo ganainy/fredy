@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Checkbox, Input, InputNumber, Progress, Tag } from '@douyinfe/semi-ui-19';
+import { Checkbox, Input, InputNumber, Progress, Radio, RadioGroup, Tag } from '@douyinfe/semi-ui-19';
 import { useOutletContext } from 'react-router';
 
 import { SegmentPart } from '../../../components/segment/SegmentPart';
@@ -51,6 +51,9 @@ export default function RoutingPage() {
   const [progress, setProgress] = useState(null);
 
   useUnsavedWarning(routingDirty);
+
+  // A key already saved on the server, or one typed into the field and not saved yet.
+  const googleKeyAvailable = form.googleMapsApiKeyConfigured === true || (form.googleMapsApiKey ?? '').trim() !== '';
 
   // Einmal beim Betreten, nicht auf einem Timer: der Sweeper laeuft alle zwei Stunden, ein Poll
   // zeigte dieselbe Zahl noch einmal. Dieselbe Abfrage, die die Fahrzeit-Seite der Einstellungen
@@ -117,6 +120,23 @@ export default function RoutingPage() {
         {/* Keine Schiene mehr um diese vier Zeilen: sie hingen an keinem Schalter, waren aber
             eingerueckt und rule-markiert und drueckten damit eine Abhaengigkeit aus, die es nicht
             gibt. Die Orte-Karte darunter behaelt ihre, weil ihre echt ist. */}
+        <AdminField wide label={t('settings.routingProvider')} help={t('settings.routingProviderHelp')}>
+          <RadioGroup
+            direction="vertical"
+            value={form.routingProvider}
+            onChange={(e) => setField('routingProvider', e.target.value)}
+            data-testid="routingProvider"
+          >
+            <Radio value="transitous">{t('settings.routingProviderTransitous')}</Radio>
+            <Radio value="google" disabled={!googleKeyAvailable}>
+              {t('settings.routingProviderGoogle')}
+            </Radio>
+          </RadioGroup>
+          {!googleKeyAvailable && (
+            <span className="travelTimePage__progressText">{t('settings.routingProviderGoogleNeedsKey')}</span>
+          )}
+        </AdminField>
+
         <AdminField
           wide
           label={t('settings.motisBaseUrl')}
@@ -163,6 +183,27 @@ export default function RoutingPage() {
             }
             onChange={(value) => setField('googleMapsApiKey', value)}
           />
+        </AdminField>
+
+        <AdminField
+          label={t('settings.googleRoutesMonthlyLimit')}
+          help={t('settings.googleRoutesMonthlyLimitHelp')}
+          htmlFor="googleRoutesMonthlyLimit"
+        >
+          <InputNumber
+            id="googleRoutesMonthlyLimit"
+            min={1}
+            max={1000000}
+            value={form.googleRoutesMonthlyLimit}
+            formatter={(value) => `${value}`.replace(/\D/g, '')}
+            onChange={(value) => setField('googleRoutesMonthlyLimit', value)}
+          />
+          <span className="travelTimePage__progressText" data-testid="googleRoutesUsage">
+            {t('settings.googleRoutesUsage', {
+              count: form.googleRoutesUsageCount ?? 0,
+              limit: form.googleRoutesMonthlyLimit,
+            })}
+          </span>
         </AdminField>
       </SegmentPart>
 

@@ -58,6 +58,8 @@ export const ROUTING_FIELDS = [
   'travelTimeMaxMinutes',
   'travelTimeStreetLookupsPerRun',
   'googleMapsApiKey',
+  'routingProvider',
+  'googleRoutesMonthlyLimit',
   'poiEnabled',
   'overpassBaseUrl',
   'poiLookupsPerRun',
@@ -138,6 +140,10 @@ function toForm(settings) {
     googleMapsApiKey: '',
     // Read-only: whether the backend holds a key, since it never sends the key itself.
     googleMapsApiKeyConfigured: settings?.googleMapsApiKeyConfigured === true,
+    routingProvider: settings?.routingProvider === 'google' ? 'google' : 'transitous',
+    googleRoutesMonthlyLimit: settings?.googleRoutesMonthlyLimit ?? 5000,
+    // Read-only: lookups sent to Google so far this month.
+    googleRoutesUsageCount: settings?.googleRoutesUsageCount ?? 0,
     poiEnabled: settings?.poiEnabled !== false,
     overpassBaseUrl: settings?.overpassBaseUrl ?? '',
     poiLookupsPerRun: settings?.poiLookupsPerRun ?? 40,
@@ -258,9 +264,11 @@ export function useAdminSettings(settings) {
           'travelTimeStreetLookupsPerRun',
           'poiLookupsPerRun',
           'poiCacheMaxAgeDays',
+          'googleRoutesMonthlyLimit',
         ]) {
           payload[name] = Number(form[name]);
         }
+        payload.routingProvider = form.routingProvider;
         payload.motisBaseUrl = form.motisBaseUrl?.trim() ?? '';
         payload.overpassBaseUrl = form.overpassBaseUrl?.trim() ?? '';
         payload.googleMapsApiKey = form.googleMapsApiKey?.trim() ?? '';

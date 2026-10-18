@@ -1333,7 +1333,7 @@
   "settings.motisBaseUrl": "Routing-Endpunkt",
   "settings.motisBaseUrlHelp": "Der Dienst, der die Verbindungen berechnet. Leer lassen für die öffentliche Transitous-Instanz; wer sie ausreizt, trägt hier seine eigene MOTIS-Instanz ein.",
   "settings.googleMapsApiKey": "Google Maps API-Schlüssel",
-  "settings.googleMapsApiKeyHelp": "Nur für die verkehrsabhängige Autofahrzeit nötig, die pro Adresse unter Fahrzeit eingeschaltet wird. MOTIS berücksichtigt nie den Verkehr; Googles Routes API tut es und hat ein kostenloses monatliches Kontingent, aber die Nutzung darüber hinaus wird über diesen Schlüssel abgerechnet. Leer lassen, um die Autofahrzeit unverändert zu lassen. Ein gespeicherter Schlüssel wird nie wieder angezeigt.",
+  "settings.googleMapsApiKeyHelp": "Nötig, wenn oben die Google Maps Route API als Routing-Anbieter gewählt ist (ÖPNV und Auto mit Verkehr) sowie für die verkehrsabhängige Autofahrzeit pro Adresse mit Transitous. Der Schlüssel ist nur schreibbar und wird nie wieder angezeigt.",
   "settings.googleMapsApiKeyPlaceholder": "Leer lassen, um den aktuellen Schlüssel zu behalten",
   "settings.googleMapsApiKeyConfigured": "Schlüssel gespeichert",
   "settings.googleMapsApiKeyMissing": "Kein Schlüssel gespeichert",
@@ -1584,5 +1584,13 @@
   "tour.step.listingTransit.title": "Nahverkehr in der Nähe",
   "tour.step.listingTransit.body": "Die nächsten Haltestellen mit ihren nächsten Abfahrten. Einrichten musst du nichts: Fredy zeigt sie für jedes Inserat mit Adresse. Klick auf eine Haltestelle, um zu sehen, wohin Bahnen und Busse fahren.",
   "tour.step.listingConnectivity.title": "Internet und Mobilfunk",
-  "tour.step.listingConnectivity.body": "Wie schnell das Internet an der Adresse sein kann und wie gut der Mobilfunkempfang ist, aus den amtlichen Breitbandregistern.\n\nEin Administrator schaltet das unter {{section}} › {{tab}} ein. Danach ergänzt Fredy es für jedes Inserat im Hintergrund."
+  "tour.step.listingConnectivity.body": "Wie schnell das Internet an der Adresse sein kann und wie gut der Mobilfunkempfang ist, aus den amtlichen Breitbandregistern.\n\nEin Administrator schaltet das unter {{section}} › {{tab}} ein. Danach ergänzt Fredy es für jedes Inserat im Hintergrund.",
+  "settings.routingProvider": "Routing-Anbieter",
+  "settings.routingProviderHelp": "Welcher Dienst die Fahrzeiten berechnet. Transitous ist kostenlos und gemeinschaftlich betrieben. Die Google Maps Route API liefert für jedes Inserat ÖPNV und Auto (mit Verkehr) zu jeder Adresse zur eingestellten Ankunftszeit und wird von Google über das kostenlose Kontingent hinaus pro Anfrage berechnet.",
+  "settings.routingProviderTransitous": "Transitous (kostenlos, Community-Dienst)",
+  "settings.routingProviderGoogle": "Google Maps Route API",
+  "settings.routingProviderGoogleNeedsKey": "Speichere unten zuerst einen Google-Maps-API-Schlüssel, bevor du Google wählst.",
+  "settings.googleRoutesMonthlyLimit": "Google-Abfragen pro Monat",
+  "settings.googleRoutesMonthlyLimitHelp": "Fredy fragt Google nicht mehr, sobald in einem Kalendermonat so viele Anfragen gesendet wurden, und nutzt dann Transitous. Auf dein kostenloses Kontingent einstellen; Preise in Google Cloud prüfen und ein Budget-Alarm setzen.",
+  "settings.googleRoutesUsage": "Diesen Monat verbraucht: {count} von {limit}"
 }
