@@ -164,7 +164,7 @@ describe('#price tracking extractors', () => {
     });
   }
 
-  // Immoscout reads its price from the mobile API rather than a rendered page, so it is driven
+  // ImmoScout24 reads its price from the mobile API rather than a rendered page, so it is driven
   // through `probe` and cannot share the fixture-based cases above.
   describe('immoscout', () => {
     const detailBody = JSON.parse(fs.readFileSync(path.join(FIXTURES, 'immoscout_detail.json'), 'utf8'));
@@ -180,7 +180,7 @@ describe('#price tracking extractors', () => {
         link: 'https://www.immobilienscout24.de/expose/123456',
       });
       // The exposé also carries "2.780 €" as Warmmiete; picking that one would report a fabricated
-      // 20% increase for every Immoscout rental at once.
+      // 20% increase for every ImmoScout24 rental at once.
       expect(extractNumber(String(price))).toBe(2300);
     });
 

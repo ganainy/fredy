@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 
 describe('#immoscout web path resolution', () => {
   describe('base paths', () => {
-    // Every base path ImmoScout serves, and the type the mobile API answers it with.
+    // Every base path ImmoScout24 serves, and the type the mobile API answers it with.
     it.each([
       ['wohnung-mieten', 'apartmentrent'],
       ['wohnung-kaufen', 'apartmentbuy'],
@@ -40,7 +40,7 @@ describe('#immoscout web path resolution', () => {
       expect(resolveWebPath(slug)).toEqual({ realType, params: {} });
     });
 
-    // Neither the plural nor a leasing variant is a page ImmoScout serves.
+    // Neither the plural nor a leasing variant is a page ImmoScout24 serves.
     it.each(['immobilien-kaufen', 'immobilie-pachten', 'immobilie-tauschen'])('should not resolve %s', (slug) => {
       expect(resolveWebPath(slug)).toBeNull();
     });
@@ -114,7 +114,7 @@ describe('#immoscout web path resolution', () => {
     });
 
     // Registering the counterpart of a one-sided slug would invent a search the website does not
-    // offer - each of these answers 410 on ImmoScout.
+    // offer - each of these answers 410 on ImmoScout24.
     it.each([
       'luxushaus-mieten',
       'luxuswohnung-mieten',
@@ -172,7 +172,7 @@ describe('#immoscout web path resolution', () => {
       });
     });
 
-    // ImmoScout stops at six rooms, publishes no warm rent page for houses, and the mobile API
+    // ImmoScout24 stops at six rooms, publishes no warm rent page for houses, and the mobile API
     // rejects calculatedtotalrent for houserent - so neither may be invented.
     it.each([
       '7-zimmer-wohnung-mieten',

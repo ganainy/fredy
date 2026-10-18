@@ -302,7 +302,7 @@ describe('buildOriginFacts', () => {
     const facts = buildOriginFacts(full, ctx);
     const provider = facts.find((fact) => fact.id === 'provider');
     expect(provider.href).toBe('https://example.test/ad/1');
-    expect(provider.value).toBe('Immoscout');
+    expect(provider.value).toBe('ImmoScout24');
     expect(facts.find((fact) => fact.id === 'job').chip).toBe(true);
   });
 
@@ -318,7 +318,7 @@ describe('buildOriginFacts', () => {
 
 describe('providerName', () => {
   it('writes a portal id the way a person writes it', () => {
-    expect(providerName('immoscout')).toBe('Immoscout');
+    expect(providerName('immoscout')).toBe('ImmoScout24');
     expect(providerName('')).toBe('');
     expect(providerName(undefined)).toBe('');
   });

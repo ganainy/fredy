@@ -24,7 +24,7 @@ const BROKER_COPY =
 
 /**
  * The same flat as the three portals actually publish it: three headlines, three address formats,
- * and two different meanings of "price" (ImmoScout is queried for the total rent, Immowelt reports
+ * and two different meanings of "price" (ImmoScout24 is queried for the total rent, Immowelt reports
  * the Kaltmiete).
  */
 const immoscout = {

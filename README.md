@@ -25,7 +25,7 @@
 
 # Fredy 🏡 - Your Self-Hosted Real Estate Finder for Europe
 
-**Fredy** watches **29 real estate portals** across 🇩🇪 🇦🇹 🇨🇭 🇪🇸 🇮🇹 🇵🇹 🇫🇷 for you (e.g. Immoscout,
+**Fredy** watches **29 real estate portals** across 🇩🇪 🇦🇹 🇨🇭 🇪🇸 🇮🇹 🇵🇹 🇫🇷 for you (e.g. ImmoScout24,
 Kleinanzeigen etc), drops duplicates across platforms, and notifies you via **Slack, Telegram,
 Email, ntfy, Discord and more** the moment a new listing appears. Searches are managed from a Web
 UI, and you never see the same listing twice.
@@ -101,7 +101,7 @@ Fredy is in the [Unraid](https://unraid.net/) community store.
     [19 more](doc/providers.md)
 -   ⚡ **Instant notifications**: Slack, Telegram, Email (SMTP, SendGrid, Mailjet, Resend), ntfy,
     Gotify, Discord, Mattermost, Pushover, Apprise and more
--   🔄 **Deduplication across platforms**: the same flat advertised on ImmoScout, Immowelt and
+-   🔄 **Deduplication across platforms**: the same flat advertised on ImmoScout24, Immowelt and
     Kleinanzeigen reaches you once, matched on living space, rooms and location rather than on the
     headline, no two portals write that the same way
 -   🛑 **[Scam detection](doc/scam-detection.md)**: a warning on listings that read like rental fraud,
@@ -117,7 +117,7 @@ Fredy is in the [Unraid](https://unraid.net/) community store.
 -   🖥️ **Web UI** in several languages, with configurable search intervals and working hours
 -   🤖 **[MCP server](lib/mcp/README.md)**: query your listings from Claude, ChatGPT or a local LLM
 -   🌍 Runs anywhere: Docker, Node.js, self-hosted, and uses the reverse engineered
-    **ImmoScout Mobile API**
+    **ImmoScout24 Mobile API**
 
 ------------------------------------------------------------------------
 
@@ -144,7 +144,7 @@ subgraph group_backend["Backend runtime"]
   node_pipeline["Job pipeline<br/>orchestrator"]
   node_providers["Providers<br/>source integrations"]
   node_extractor["Extraction stack<br/>scraping services"]
-  node_immoscout["ImmoScout path<br/>mobile-api translator"]
+  node_immoscout["ImmoScout24 path<br/>mobile-api translator"]
   node_notifications["Notifications<br/>delivery adapters"]
   node_storage[("SQLite storage<br/>persistence layer")]
   node_api["API routes<br/>http contract"]
@@ -235,7 +235,7 @@ class node_debug,node_mcp toneMint
 
 | Topic | What is in there |
 |---|---|
-| [Providers & scraping](doc/providers.md) | All 29 providers, the Immoscout / idealista / Casa.it / French portal specifics, and residential proxies for when a VPS gets blocked |
+| [Providers & scraping](doc/providers.md) | All 29 providers, the ImmoScout24 / idealista / Casa.it / French portal specifics, and residential proxies for when a VPS gets blocked |
 | [Scam detection](doc/scam-detection.md) | The signals, their weights, the languages, and how to overrule Fredy |
 | [Financing calculator](doc/financing.md) | Rent and Annuitätendarlehen, Kaufnebenkosten, Restschuld, the 35 % rule |
 | [Travel time & public transport](doc/travel-time.md) | Addresses and place types, estimated vs exact, route drawing, departure boards, operator settings |
@@ -341,7 +341,7 @@ Because of these conditions Fredy is **source-available, not OSI open source**. 
 
 - **Bugs and feature requests**: [GitHub Issues](https://github.com/orangecoding/fredy/issues). For
   bugs, attach a [debug bundle](doc/debugging.md).
-- **An Immoscout search URL Fredy cannot map**: open an issue with the URL, it is usually a one line
+- **An ImmoScout24 search URL Fredy cannot map**: open an issue with the URL, it is usually a one line
   fix.
 - **Try before you install**: the [live demo](https://fredy-demo.orange-coding.net/).
 

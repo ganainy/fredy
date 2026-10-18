@@ -21,7 +21,7 @@ import {
   _resetDraftsForTests,
 } from '../../lib/mcp/jobDraftStore.js';
 
-const IMMOSCOUT = { id: 'immoscout', name: 'Immoscout', baseUrl: 'https://www.immobilienscout24.de/' };
+const IMMOSCOUT = { id: 'immoscout', name: 'ImmoScout24', baseUrl: 'https://www.immobilienscout24.de/' };
 const IMMOWELT = { id: 'immowelt', name: 'Immowelt', baseUrl: 'https://www.immowelt.de/' };
 
 const CTX = {
@@ -294,7 +294,7 @@ describe('what gets saved', () => {
       name: 'Köln',
       enabled: true,
       blacklist: ['Tausch'],
-      provider: [{ id: 'immoscout', name: 'Immoscout', url: RENT_URL, enabled: true }],
+      provider: [{ id: 'immoscout', name: 'ImmoScout24', url: RENT_URL, enabled: true }],
       notificationAdapter: [{ configuredAdapterId: 'c1' }],
       shareWithUsers: ['u2'],
       spatialFilter: null,

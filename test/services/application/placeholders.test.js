@@ -93,7 +93,7 @@ describe('listing values', () => {
   });
 
   it('prefers a readable provider name over the internal provider id', () => {
-    expect(resolve({ providerName: 'Immoscout' })['listing.provider']).toBe('Immoscout');
+    expect(resolve({ providerName: 'ImmoScout24' })['listing.provider']).toBe('ImmoScout24');
     expect(resolve()['listing.provider']).toBe('immoscout');
   });
 

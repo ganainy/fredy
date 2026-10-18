@@ -344,6 +344,9 @@ export function buildOriginFacts(listing, ctx) {
   return facts;
 }
 
+/** Portals whose written name is not just their id with a capital. */
+const PORTAL_NAMES = { immoscout: 'ImmoScout24', immoscoutAt: 'ImmoScout24 Österreich' };
+
 /**
  * The portal's name as a person writes it, from the lowercase id the scraper stores.
  *
@@ -352,5 +355,6 @@ export function buildOriginFacts(listing, ctx) {
  */
 export function providerName(provider) {
   if (!provider) return '';
+  if (PORTAL_NAMES[provider]) return PORTAL_NAMES[provider];
   return provider.charAt(0).toUpperCase() + provider.slice(1);
 }

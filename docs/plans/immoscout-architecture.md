@@ -1,4 +1,4 @@
-# ImmoScout: leichter bauen, ohne Features zu verlieren
+# ImmoScout24: leichter bauen, ohne Features zu verlieren
 
 Stand nach dem Österreich-Umbau. Erster Teil beschreibt, was jetzt da ist und warum. Zweiter Teil
 sind Vorschläge, die noch nicht umgesetzt sind, mit Aufwand und Risiko.
@@ -27,7 +27,7 @@ Ein zweiter Provider per Copy-Paste hätte rund 900 gekostet **und** eine zweite
 526-Zeilen-Clients erzeugt, die bei jedem API-Wechsel mitgezogen werden müsste.
 
 Entscheidend für alles Weitere: **rund 900 der 1889 Zeilen sind handgepflegte Tabellen**
-(`at-paths`, `web-paths`, `param-support`). Das ist der Teil, der verrottet, wenn ImmoScout eine
+(`at-paths`, `web-paths`, `param-support`). Das ist der Teil, der verrottet, wenn ImmoScout24 eine
 Seite ändert, und der Teil, den niemand vollständig bekommt.
 
 ## Was jetzt steht: Deskriptor über Engine
@@ -95,12 +95,12 @@ Wenn das noch stimmt, ist die 253-Zeilen-Tabelle ersetzbar: beim **Speichern** e
 Suchseite einmal laden, `lastSearchApiUrl` lesen, die Mobile-URL am Job ablegen. Tabelle bleibt
 als Fallback, darf aber verrotten, ohne dass jemand etwas merkt.
 
-- **Gewinn:** jeder ImmoScout-Filter funktioniert ab Tag eins, auch die, die keine Tabelle kennt.
+- **Gewinn:** jeder ImmoScout24-Filter funktioniert ab Tag eins, auch die, die keine Tabelle kennt.
   `Real estate type not found` verschwindet als Fehlerklasse.
 - **Kosten:** ein Request pro Job-Speicherung, nicht pro Lauf.
 - **Risiko, und zwar ein echtes:** die DE-Seite antwortet auf einfache Requests mit 401 (in dieser
   Session gemessen, für `/Suche/...` genauso wie für `/expose/...`). Das bräuchte also den
-  Browser- oder Proxy-Pfad, den das Repo für andere Provider schon hat, und würde ImmoScout die
+  Browser- oder Proxy-Pfad, den das Repo für andere Provider schon hat, und würde ImmoScout24 die
   Eigenschaft nehmen, der einzige vollständig browserfreie Provider zu sein. **Ich konnte
   `lastSearchApiUrl` in dieser Session nicht nachprüfen**, genau wegen dieser 401. Vor einer
   Umsetzung gehört das verifiziert, sonst ist der ganze Vorschlag Spekulation auf einem

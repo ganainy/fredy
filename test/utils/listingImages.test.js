@@ -14,7 +14,7 @@ import { pictureKey, withoutFirstPicture } from '../../lib/utils/listingImages.j
 describe('pictureKey', () => {
   it.each([
     [
-      'ImmoScout, search against exposé',
+      'ImmoScout24, search against exposé',
       'https://pictures.immobilienscout24.de/listings/ba3969a3-72d1-4094-b026-ec9476786b82-2063887398.jpg/ORIG/resize/800x600>/format/webp/quality/80',
       'https://pictures.immobilienscout24.de/listings/ba3969a3-72d1-4094-b026-ec9476786b82-2063887398.jpg/ORIG/resize/1500x1000/format/webp/quality/80',
     ],

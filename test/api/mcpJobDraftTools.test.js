@@ -43,7 +43,7 @@ const RENT_URL = 'https://www.immobilienscout24.de/Suche/de/nordrhein-westfalen/
 
 /** A context whose channel still carries a secret, so a leak would show up in the output. */
 const context = (overrides = {}) => ({
-  providers: [{ id: 'immoscout', name: 'Immoscout', baseUrl: 'https://www.immobilienscout24.de/' }],
+  providers: [{ id: 'immoscout', name: 'ImmoScout24', baseUrl: 'https://www.immobilienscout24.de/' }],
   channels: [{ id: 'c1', name: 'Family', adapterId: 'telegram' }],
   addresses: ['Work'],
   shareableUsers: [{ id: 'u2', name: 'bob' }],
@@ -82,7 +82,7 @@ beforeEach(() => {
     name: 'Köln',
     enabled: true,
     dealType: 'rent',
-    provider: [{ id: 'immoscout', name: 'Immoscout', url: RENT_URL }],
+    provider: [{ id: 'immoscout', name: 'ImmoScout24', url: RENT_URL }],
     blacklist: [],
   });
 });

@@ -15,13 +15,13 @@ platform into Fredy.
 |---|---|---|
 | 1a Immobilien | Immo Südwest Presse | Neubau Kompass |
 | Deutsche Wohnen | Immobilien.de | OhneMakler |
-| Engel & Völkers | Immoscout | Regionalimmobilien24 |
+| Engel & Völkers | ImmoScout24 | Regionalimmobilien24 |
 | IMAXX | Immowelt | Schwarzes Brett Bremen |
 | InBerlinWohnen | Kleinanzeigen | Sparkasse Immobilien |
 | McMakler | Wg gesucht | |
 
 **🇩🇪 Germany · 🇦🇹 Austria · 🇨🇭 Switzerland** · BETTERHOMES
-**🇦🇹 Austria** · willhaben · Immoscout Österreich
+**🇦🇹 Austria** · willhaben · ImmoScout24 Österreich
 **🇨🇭 Switzerland** · Flatfox
 **🇪🇸 Spain · 🇮🇹 Italy · 🇵🇹 Portugal** · idealista
 **🇮🇹 Italy** · Subito · Tecnocasa · Tecnorete · Casa.it
@@ -30,11 +30,11 @@ platform into Fredy.
 If you run a portal Fredy does not cover yet, contributions are very welcome, see
 [CONTRIBUTING.md](../CONTRIBUTING.md).
 
-## Immoscout
+## ImmoScout24
 
-Immoscout has implemented advanced bot detection. To work around this, Fredy uses a reverse
+ImmoScout24 has implemented advanced bot detection. To work around this, Fredy uses a reverse
 engineered version of their mobile API, see the
-[Immoscout reverse engineering documentation](../reverse-engineered-immoscout.md).
+[ImmoScout24 reverse engineering documentation](../reverse-engineered-immoscout.md).
 
 Paste the search URL from your browser as usual. Beside flats and houses this covers plots, garages,
 WG rooms, short term lets, assisted living and foreclosures, region, radius and drawn-shape
@@ -44,7 +44,7 @@ searches (offices, shops, gastronomy) are not supported.
 
 Worth knowing:
 
-- A filter that Immoscout's own API does not offer for the type you are searching (a pets filter on
+- A filter that ImmoScout24's own API does not offer for the type you are searching (a pets filter on
   a house purchase, say) is **dropped** and logged, because sending it makes their API reject the
   whole search.
 - A filter Fredy has no translation for yet is dropped as well, and says so in the log:
@@ -53,7 +53,7 @@ Worth knowing:
 - If a search URL cannot be mapped at all, the job fails with `Real estate type not found: <path>`.
   Please open an issue with the URL, it is a one line fix.
 
-## Immoscout Österreich
+## ImmoScout24 Österreich
 
 `immobilienscout24.at` is a separate provider (`immoscoutAt`), not a country setting on the German
 one. The two websites share nothing you can see: Austria has its own URL scheme
@@ -235,7 +235,7 @@ socks5://user:pass@host:port
 ```
 
 Leave the field empty to disable. The proxy applies to all headless-browser providers and takes
-effect on the next job run (no restart needed). Immoscout uses a separate mobile API and is not
+effect on the next job run (no restart needed). ImmoScout24 uses a separate mobile API and is not
 affected.
 
 ### Where to get one

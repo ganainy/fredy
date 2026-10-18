@@ -126,7 +126,7 @@ describe('services/demo/demoService', () => {
     it('creates the demo job with a channel referencing the demo adapter and dealType rent', async () => {
       const { seedDemoJob, DEMO_JOB_ID, DEMO_JOB_NAME } = await loadService();
 
-      await seedDemoJob([provider('immoscout', 'Immoscout'), provider('kleinanzeigen', 'Kleinanzeigen')]);
+      await seedDemoJob([provider('immoscout', 'ImmoScout24'), provider('kleinanzeigen', 'Kleinanzeigen')]);
 
       const job = state.jobs[DEMO_JOB_ID];
       expect(job.name).toBe(DEMO_JOB_NAME);
@@ -140,7 +140,7 @@ describe('services/demo/demoService', () => {
       expect(job.provider).toHaveLength(2);
       expect(job.provider[0]).toEqual({
         id: 'immoscout',
-        name: 'Immoscout',
+        name: 'ImmoScout24',
         url: expect.stringContaining('immobilienscout24.de'),
         enabled: true,
       });
@@ -149,8 +149,8 @@ describe('services/demo/demoService', () => {
     it('reuses the demo channel on a repeat seeding instead of creating a duplicate', async () => {
       const { seedDemoJob, DEMO_JOB_ID } = await loadService();
 
-      await seedDemoJob([provider('immoscout', 'Immoscout')]);
-      await seedDemoJob([provider('immoscout', 'Immoscout')]);
+      await seedDemoJob([provider('immoscout', 'ImmoScout24')]);
+      await seedDemoJob([provider('immoscout', 'ImmoScout24')]);
 
       expect(state.channels).toHaveLength(1);
       expect(state.jobs[DEMO_JOB_ID].notificationAdapter).toEqual([{ configuredAdapterId: 'channel-1' }]);
@@ -159,7 +159,7 @@ describe('services/demo/demoService', () => {
     it('skips a provider module that has no demo url', async () => {
       const { seedDemoJob, DEMO_JOB_ID } = await loadService();
 
-      await seedDemoJob([provider('immoscout', 'Immoscout'), provider('doesNotExist', 'Nope')]);
+      await seedDemoJob([provider('immoscout', 'ImmoScout24'), provider('doesNotExist', 'Nope')]);
 
       expect(state.jobs[DEMO_JOB_ID].provider.map((p) => p.id)).toEqual(['immoscout']);
     });
@@ -175,7 +175,7 @@ describe('services/demo/demoService', () => {
         notificationAdapter: [{ id: 'slack', fields: { token: 'x' } }],
       };
 
-      await seedDemoJob([provider('immoscout', 'Immoscout')]);
+      await seedDemoJob([provider('immoscout', 'ImmoScout24')]);
 
       expect(Object.keys(state.jobs)).toEqual([DEMO_JOB_ID]);
       expect(state.jobs[DEMO_JOB_ID].userId).toBe('u-demo');
@@ -188,7 +188,7 @@ describe('services/demo/demoService', () => {
       state.settings.demoMode = false;
       const { seedDemoJob } = await loadService();
 
-      await seedDemoJob([provider('immoscout', 'Immoscout')]);
+      await seedDemoJob([provider('immoscout', 'ImmoScout24')]);
 
       expect(state.jobs).toEqual({});
     });
@@ -197,7 +197,7 @@ describe('services/demo/demoService', () => {
       state.users = [{ id: 'u-admin', username: 'admin', isAdmin: true }];
       const { seedDemoJob } = await loadService();
 
-      await seedDemoJob([provider('immoscout', 'Immoscout')]);
+      await seedDemoJob([provider('immoscout', 'ImmoScout24')]);
 
       expect(state.jobs).toEqual({});
     });
@@ -230,7 +230,7 @@ describe('services/demo/demoService', () => {
       const { seedDemoProviderDetails } = await loadService();
 
       await seedDemoProviderDetails([
-        provider('immoscout', 'Immoscout'),
+        provider('immoscout', 'ImmoScout24'),
         provider('kleinanzeigen', 'Kleinanzeigen'),
         provider('noDemoUrl', 'Not in the demo'),
       ]);
@@ -242,7 +242,7 @@ describe('services/demo/demoService', () => {
       state.userSettings['u-demo'] = { provider_details: [] };
       const { seedDemoProviderDetails } = await loadService();
 
-      await seedDemoProviderDetails([provider('immoscout', 'Immoscout')]);
+      await seedDemoProviderDetails([provider('immoscout', 'ImmoScout24')]);
 
       expect(state.userSettings['u-demo'].provider_details).toEqual(['immoscout']);
     });
@@ -251,7 +251,7 @@ describe('services/demo/demoService', () => {
       state.settings.demoMode = false;
       const { seedDemoProviderDetails } = await loadService();
 
-      await seedDemoProviderDetails([provider('immoscout', 'Immoscout')]);
+      await seedDemoProviderDetails([provider('immoscout', 'ImmoScout24')]);
 
       expect(state.userSettings['u-demo']).toBeUndefined();
     });
@@ -260,7 +260,7 @@ describe('services/demo/demoService', () => {
       state.users = [];
       const { seedDemoProviderDetails } = await loadService();
 
-      await seedDemoProviderDetails([provider('immoscout', 'Immoscout')]);
+      await seedDemoProviderDetails([provider('immoscout', 'ImmoScout24')]);
 
       expect(state.userSettings['u-demo']).toBeUndefined();
     });
@@ -342,7 +342,7 @@ describe('services/demo/demoService', () => {
       state.userSettings['u-demo'] = { theme: 'light', language: 'de' };
       const { seedDemo, DEMO_JOB_ID } = await loadService();
 
-      await seedDemo([provider('immoscout', 'Immoscout')]);
+      await seedDemo([provider('immoscout', 'ImmoScout24')]);
 
       expect(state.jobs[DEMO_JOB_ID]).toBeDefined();
       expect(state.userSettings['u-demo'].provider_details).toEqual(['immoscout']);

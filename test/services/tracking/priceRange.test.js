@@ -180,7 +180,7 @@ describe('services/tracking/priceRange', () => {
 
     it('every shipped provider has been looked at', () => {
       const declared = new Set([...RECORDED_SEARCHES, ...NO_RANGE_IN_URL].map(([id]) => id));
-      // Both ImmoScout sites read their range with a parser rather than a pair of named
+      // Both ImmoScout24 sites read their range with a parser rather than a pair of named
       // parameters, so neither can be recorded as a `[min, max]` row above. They have describes of
       // their own instead.
       declared.add('immoscout');

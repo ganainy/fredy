@@ -129,7 +129,7 @@ describe('#immoscout parameter support', () => {
       expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('housebuy'));
     });
 
-    // A filter ImmoScout has and this table does not know about yet is a gap in Fredy. It cannot be
+    // A filter ImmoScout24 has and this table does not know about yet is a gap in Fredy. It cannot be
     // forwarded, but it must not vanish without a trace either - the log line is the only place the
     // gap can surface.
     it('should name a filter it has no translator for', () => {

@@ -202,7 +202,7 @@ describe('buildApplicationLetter profile reporting', () => {
 });
 
 describe('buildApplicationLetter contact', () => {
-  it('addresses the agent by name when ImmoScout published one', async () => {
+  it('addresses the agent by name when ImmoScout24 published one', async () => {
     const { buildApplicationLetter } = await loadService({
       settings: { language: 'de', applicant_profile: fullProfile },
     });
@@ -215,7 +215,7 @@ describe('buildApplicationLetter contact', () => {
   });
 
   it("does not let another portal's advertiser write the salutation", async () => {
-    // The `Agent:` line is a format Fredy itself prepends, and only for ImmoScout. Parsing it out
+    // The `Agent:` line is a format Fredy itself prepends, and only for ImmoScout24. Parsing it out
     // of any description makes whoever wrote the advert the author of the greeting.
     const { buildApplicationLetter } = await loadService({
       settings: { language: 'de', applicant_profile: fullProfile },
@@ -246,18 +246,18 @@ describe('buildApplicationLetter provider name', () => {
         applicant_profile: fullProfile,
         application_templates: { de: { rent: '{{listing.provider}}' } },
       },
-      providers: [{ metaInformation: { id: 'immoscout', name: 'Immoscout' } }],
+      providers: [{ metaInformation: { id: 'immoscout', name: 'ImmoScout24' } }],
     });
-    expect((await buildApplicationLetter(listing, 'user-1')).text).toBe('Immoscout');
+    expect((await buildApplicationLetter(listing, 'user-1')).text).toBe('ImmoScout24');
   });
 
   it('reports the portal name alongside the letter, so the dialog can say why it chose a language', async () => {
     const { buildApplicationLetter } = await loadService({
       settings: { language: 'de', applicant_profile: fullProfile },
-      providers: [{ metaInformation: { id: 'immoscout', name: 'Immoscout' } }],
+      providers: [{ metaInformation: { id: 'immoscout', name: 'ImmoScout24' } }],
     });
     const result = await buildApplicationLetter(listing, 'user-1');
-    expect(result.providerName).toBe('Immoscout');
+    expect(result.providerName).toBe('ImmoScout24');
   });
 
   it('reports the provider id as the portal name when nothing better is known', async () => {

@@ -22,7 +22,7 @@ describe('the order providers are offered in', () => {
     const sorted = sortProviders([
       provider('flatfox', 'Flatfox', ['ch']),
       provider('willhaben', 'willhaben', ['at']),
-      provider('immoscout', 'Immoscout', ['de']),
+      provider('immoscout', 'ImmoScout24', ['de']),
     ]);
 
     expect(sorted.map((p) => p.id)).toEqual(['immoscout', 'willhaben', 'flatfox']);
@@ -32,7 +32,7 @@ describe('the order providers are offered in', () => {
     const sorted = sortProviders([
       provider('einsAImmobilien', '1a Immobilien', ['de']),
       provider('kleinanzeigen', 'Kleinanzeigen', ['de']),
-      provider('immoscout', 'Immoscout', ['de']),
+      provider('immoscout', 'ImmoScout24', ['de']),
       provider('immowelt', 'Immowelt', ['de']),
     ]);
 
@@ -54,14 +54,14 @@ describe('the order providers are offered in', () => {
     const sorted = sortProviders([
       provider('dutch', 'Een Portaal', ['nl']),
       provider('flatfox', 'Flatfox', ['ch']),
-      provider('immoscout', 'Immoscout', ['de']),
+      provider('immoscout', 'ImmoScout24', ['de']),
     ]);
 
     expect(sorted.map((p) => p.id)).toEqual(['immoscout', 'flatfox', 'dutch']);
   });
 
   it('leaves the array it was given alone', () => {
-    const input = [provider('flatfox', 'Flatfox', ['ch']), provider('immoscout', 'Immoscout', ['de'])];
+    const input = [provider('flatfox', 'Flatfox', ['ch']), provider('immoscout', 'ImmoScout24', ['de'])];
     sortProviders(input);
 
     expect(input.map((p) => p.id)).toEqual(['flatfox', 'immoscout']);
@@ -78,7 +78,7 @@ describe('a provider covering several countries', () => {
     const sorted = sortProviders([
       provider('flatfox', 'Flatfox', ['ch']),
       provider('dach', 'DACH Portal', ['at', 'de']),
-      provider('immoscout', 'Immoscout', ['de']),
+      provider('immoscout', 'ImmoScout24', ['de']),
     ]);
 
     expect(sorted.map((p) => p.id)).toEqual(['immoscout', 'dach', 'flatfox']);
@@ -105,7 +105,7 @@ describe('the flag of a country', () => {
 
   // The flag is decoration; a provider whose declaration is broken must still be pickable.
   it('leaves the name usable when there is no flag to show', () => {
-    expect(labelWithFlags({ name: 'Immoscout' })).toBe('Immoscout');
+    expect(labelWithFlags({ name: 'ImmoScout24' })).toBe('ImmoScout24');
   });
 });
 

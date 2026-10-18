@@ -9,7 +9,7 @@ import { normalizeHost, validateProviderUrl } from '../../ui/src/services/jobs/p
 
 const immoscout = {
   id: 'immoscout',
-  name: 'Immoscout',
+  name: 'ImmoScout24',
   baseUrl: 'https://www.immobilienscout24.de/',
 };
 

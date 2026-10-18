@@ -23,7 +23,7 @@ import {
  * and the MCP job interview refuses the same one. Two different answers means a job the form would
  * never have saved can be created over MCP, run on schedule, and quietly find nothing.
  */
-const PROVIDER = { id: 'immoscout', name: 'Immoscout', baseUrl: 'https://www.immobilienscout24.de/' };
+const PROVIDER = { id: 'immoscout', name: 'ImmoScout24', baseUrl: 'https://www.immobilienscout24.de/' };
 
 /**
  * A portal serving several countries under several domains, which is the case the copies actually

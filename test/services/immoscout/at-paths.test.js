@@ -213,7 +213,7 @@ describe('#at-paths translateAtQueryParams()', () => {
     });
   });
 
-  // An absent bound is an empty half, which is the shape ImmoScout's own pages emit - not a bound
+  // An absent bound is an empty half, which is the shape ImmoScout24's own pages emit - not a bound
   // of zero, which would be a different search.
   it('leaves an absent bound empty', () => {
     expect(translateAtQueryParams({ primaryPriceTo: '1200' })).toEqual({ price: '-1200.0' });

@@ -82,7 +82,7 @@ Details worth knowing:
 
 Example prompts:
 
-> "Create a new search for two-bedroom flats to rent in Cologne on ImmoScout, notify me on Telegram."
+> "Create a new search for two-bedroom flats to rent in Cologne on ImmoScout24, notify me on Telegram."
 
 > "Add a note to listing abc123: viewing on Tuesday at 6, agent said pets are fine."
 

@@ -304,7 +304,7 @@ describe('#immoscout-mobile URL conversion', () => {
     });
 
     // A filter we have no translator for must be visible in the logs rather than vanishing: it is
-    // the only signal that ImmoScout grew a filter Fredy does not know yet.
+    // the only signal that ImmoScout24 grew a filter Fredy does not know yet.
     it('should log a filter it has no translator for', () => {
       const converted = convertWebToMobile(`${BERLIN}/wohnung-mieten?listingtags=holzbalken`);
 
@@ -349,7 +349,7 @@ describe('#immoscout-mobile URL conversion', () => {
     });
   });
 
-  // Replays the whole catalogue of known paths against the real mobile API. A path ImmoScout
+  // Replays the whole catalogue of known paths against the real mobile API. A path ImmoScout24
   // retired, or a parameter a type stopped accepting, shows up as a 412 here and nowhere else -
   // the offline fixtures cannot notice either. Skipped offline, where fetch is mocked.
   it.skipIf(process.env.TEST_MODE === 'offline')(
@@ -389,7 +389,7 @@ describe('#immoscout-mobile URL conversion', () => {
         }),
       });
       if (!response.ok) {
-        console.error('Error fetching data from ImmoScout Mobile API:', response.statusText);
+        console.error('Error fetching data from ImmoScout24 Mobile API:', response.statusText);
       }
 
       expect([null, true]).toContain(response.ok);

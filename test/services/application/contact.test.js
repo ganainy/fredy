@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
 import { parseAgentFromDescription } from '../../../lib/services/application/contact.js';
 
 /**
- * The strings below are not guesses at ImmoScout's HTML - they are exactly what Fredy itself writes
+ * The strings below are not guesses at ImmoScout24's HTML - they are exactly what Fredy itself writes
  * in `buildDescription` (lib/provider/immoscout.js). Keep them byte-identical to that template,
  * trailing spaces included, or this suite stops testing the real input.
  */
@@ -71,7 +71,7 @@ describe('parseAgentFromDescription', () => {
 
 describe('parseAgentFromDescription with awkward agency names', () => {
   it('keeps a company whose own name contains parentheses out of the agent name', () => {
-    // Franchise and licence-partner suffixes are common on ImmoScout.
+    // Franchise and licence-partner suffixes are common on ImmoScout24.
     expect(parseAgentFromDescription('Agent: Herr Schmidt (Engel & Völkers (Altona)) - 5 stars\n')).toEqual({
       name: 'Herr Schmidt',
       company: 'Engel & Völkers (Altona)',

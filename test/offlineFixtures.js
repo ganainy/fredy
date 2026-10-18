@@ -52,7 +52,7 @@ const IDEALISTA_PAGES = {
 };
 
 /**
- * ImmoScout's two national sites are answered by one mobile API, so each needs a recording of its
+ * ImmoScout24's two national sites are answered by one mobile API, so each needs a recording of its
  * own under the same host. Keyed by the country their geocodes name.
  */
 const IMMOSCOUT_LIST_FIXTURES = { de: 'immoscout_list.json', at: 'immoscoutAt_list.json' };
@@ -227,7 +227,7 @@ export function buildFetchMock() {
   let idealistaListData = null;
   let casaPlaces = null;
   let casaListData = null;
-  // One mobile API answers for both ImmoScout national sites, so each has a recording of its own
+  // One mobile API answers for both ImmoScout24 national sites, so each has a recording of its own
   // and the request says which one it wants. Keyed by country to keep that explicit.
   const immoscoutListData = { de: null, at: null };
   const immoscoutDetailData = { de: null, at: null };

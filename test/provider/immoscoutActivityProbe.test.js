@@ -47,7 +47,7 @@ const LINK = 'https://www.immobilienscout24.de/expose/170704478';
 const MOBILE_LINK = 'https://api.mobile.immobilienscout24.de/expose/170704478';
 
 /**
- * Immoscout answers the alive-check from its mobile JSON API rather than from a website, so it
+ * ImmoScout24 answers the alive-check from its mobile JSON API rather than from a website, so it
  * brings its own probe instead of using the shared one. That probe used to be a single bare fetch -
  * no pacing, no retry, no idea what a 429 meant - which is how a nightly run turned into a page of
  * "Unknown status ... 429" warnings and, ten runs later, deactivated listings that were still live.

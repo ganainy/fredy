@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 
 describe('#immoscout shape parameter', () => {
   // A shape drawn by hand on the map arrives as a bare polyline rather than base64. Decoding one of
-  // those does not throw, it quietly returns broken UTF-8, and ImmoScout answers 400 "Cannot parse
+  // those does not throw, it quietly returns broken UTF-8, and ImmoScout24 answers 400 "Cannot parse
   // shape", so the polyline has to reach the mobile API byte for byte.
   it('should pass a raw polyline through untouched', () => {
     const polyline =
@@ -56,18 +56,18 @@ describe('#immoscout shape parameter', () => {
     expect(toPolyline(shape)).toBe(shape);
   });
 
-  // ImmoScout writes the payload URL-safe, mapping `+` to `_`. Reading that `_` as base64url's `/`
+  // ImmoScout24 writes the payload URL-safe, mapping `+` to `_`. Reading that `_` as base64url's `/`
   // instead lands one past the end of the polyline alphabet and the mobile API answers 500, which
   // is what this shape - a drawn area in Hamburg Altona - used to do. The expectation is the
-  // polyline ImmoScout's own search page resolves it to, taken from its `lastSearchApiUrl`.
-  it('should decode a shape using ImmoScout url-safe alphabet', () => {
+  // polyline ImmoScout24's own search page resolves it to, taken from its `lastSearchApiUrl`.
+  it('should decode a shape using ImmoScout24 url-safe alphabet', () => {
     const shape =
       'X3p7ZUl5aWF7QGp9QXtoRmtFeX5OcWZAfWJDdWpCfXtNZV9Cblxfd0BsaUN0S3R_SH5tQWpqSGNSdG1DeUJicURmQGVQdFRmc0RsfUBgakE.';
 
     expect(toPolyline(shape)).toBe('_z{eIyia{@j}A{hFkEy~Nqf@}bCujB}{Me_Bn\\_w@liCtKt~H~mAjjHcRtmCyBbqDf@ePtTfsDl}@`jA');
   });
 
-  // The `-` counterpart never turned up in a sample, so base64url is tried behind ImmoScout's own
+  // The `-` counterpart never turned up in a sample, so base64url is tried behind ImmoScout24's own
   // mapping rather than instead of it. Either way the decode has to be a polyline to be kept.
   it('should decode a base64url shape', () => {
     const polyline = 'ymrwHidih@`IkS_Aal@oTsVoViClw@g?~';
