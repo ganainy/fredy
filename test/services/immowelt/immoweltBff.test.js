@@ -22,6 +22,9 @@ const SEARCH_REQUEST = {
   paging: { page: 1, size: 100, order: 'DateDesc' },
 };
 
+/** The polyline the resolved commute search carries, real for #430's area, shortened to six points. */
+const POLYLINE = 'egqdHetyeAz@m@xAe@~AO`BF|A\\';
+
 /** Every request the page issued, in order. */
 let requests;
 
@@ -37,16 +40,33 @@ let gotos;
  *
  * @param {(url: string, init?: any) => {status: number, body: string, stream?: any}} handler answers one
  *   request; `stream` becomes the response's `body` stream
+ * @param {{count?: string, gotoStatus?: number, waitError?: Error, waitFailures?: number}} [flow] how
+ *   the commute resolution behaves: `count` is the body the result-count request answers with
+ *   (default: the resolved boundary), `gotoStatus` what the search page's navigation answers,
+ *   `waitError` what every wait for the count rejects with, `waitFailures` how many of the first
+ *   waits stay silent before one answers
  * @returns {any} something shaped enough like a puppeteer browser
  */
-function fakeBrowser(handler) {
+function fakeBrowser(handler, { count = null, gotoStatus = 200, waitError = null, waitFailures = 0 } = {}) {
   const page = {
     isClosed: () => false,
     goto: async (url) => {
       gotos.push(String(url));
+      return { status: () => gotoStatus };
     },
     waitForFunction: async () => {},
     close: async () => {},
+    waitForRequest: async () => {
+      if (waitError != null) throw waitError;
+      if (waitFailures > 0) {
+        waitFailures -= 1;
+        throw Object.assign(new Error('timed out'), { name: 'TimeoutError' });
+      }
+      return {
+        url: () => 'https://www.immowelt.de/search-mfe-bff/v1/count',
+        fetchPostData: async () => count ?? JSON.stringify({ criteria: { location: { polylines: [POLYLINE] } } }),
+      };
+    },
     evaluate: async (fn, ...args) => {
       const original = globalThis.fetch;
       globalThis.fetch = async (url, init) => {
@@ -388,21 +408,18 @@ describe('#immowelt bff transport, exposé probe', () => {
   });
 });
 
-// The two calls immowelt's own page makes before every commute search, and the answers it gets:
-// the street's coordinates, then the area reachable from them. The ring and the polyline are the
-// real ones for #430's url ("15 minutes' walk of Schwanseestraße"), shortened to six points.
+// A commute search is resolved by immowelt itself: the job's search url is loaded, and the boundary
+// comes back on the result-count request the page's frontend posts. The polyline is the real one
+// for #430's area ("15 minutes' walk of Schwanseestraße"), shortened to six points.
 describe('#immowelt bff transport, commute areas', () => {
-  const RING = [
-    [11.60531158, 48.09858673],
-    [11.60553739, 48.09829432],
-    [11.60573394, 48.0978433],
-    [11.60581443, 48.09735794],
-    [11.605774, 48.09686761],
-    [11.60561509, 48.096402],
-  ];
-  const POLYLINE = 'egqdHetyeAz@m@xAe@~AO`BF|A\\';
+  const SEARCH_URL =
+    'https://www.immowelt.de/classified-search?distributionTypes=Buy' +
+    `&locations=${Buffer.from(JSON.stringify({ placeIds: ['STRTDE197842'], duration: '15', mode: 'Walk' })).toString(
+      'base64url',
+    )}`;
 
   const COMMUTE_REQUEST = {
+    searchUrl: SEARCH_URL,
     criteria: { distributionTypes: ['Buy'], location: {} },
     paging: { page: 1, size: 100, order: 'DateDesc' },
     commutes: [{ placeId: 'STRTDE197842', duration: 15, mode: 'Walk' }],
@@ -412,28 +429,21 @@ describe('#immowelt bff transport, commute areas', () => {
   let posted;
 
   /**
-   * @param {object} [overrides] answers to replace, keyed by the path they belong to
+   * @param {{count?: string, gotoStatus?: number, waitError?: Error, waitFailures?: number}} [overrides]
+   *   behaviour to replace
    * @returns {any} a browser answering the whole commute flow
    */
-  function commuteBrowser(overrides = {}) {
-    return fakeBrowser((url, init) => {
-      if (url.startsWith('/search-mfe-bff/places/data')) {
-        return (
-          overrides.places ?? {
-            status: 200,
-            body: JSON.stringify({ places: [{ coordinates: { lat: 48.1, lng: 11.6 } }] }),
-          }
-        );
-      }
-      if (url.startsWith('/search-mfe-bff/routing/isochrone')) {
-        return overrides.routing ?? { status: 200, body: JSON.stringify({ isochrone: [[RING]] }) };
-      }
-      if (url.startsWith('/serp-bff/search')) {
-        posted.push(JSON.parse(init.body));
-        return { status: 200, body: searchResponse(1) };
-      }
-      return { status: 200, body: listResponse(url) };
-    });
+  function commuteBrowser({ count = null, gotoStatus = 200, waitError = null, waitFailures = 0 } = {}) {
+    return fakeBrowser(
+      (url, init) => {
+        if (url.startsWith('/serp-bff/search')) {
+          posted.push(JSON.parse(init.body));
+          return { status: 200, body: searchResponse(1) };
+        }
+        return { status: 200, body: listResponse(url) };
+      },
+      { count, gotoStatus, waitError, waitFailures },
+    );
   }
 
   beforeEach(() => {
@@ -442,18 +452,23 @@ describe('#immowelt bff transport, commute areas', () => {
     posted = [];
   });
 
-  it('draws the commute area before searching and sends it as the search boundary', async () => {
+  it('lets immowelt draw the boundary on its search page and sends it as the search boundary', async () => {
     await searchClassifieds(commuteBrowser(), COMMUTE_REQUEST, DE);
 
-    expect(requests[0]).toContain('/search-mfe-bff/places/data?placesIds%5B%5D=STRTDE197842');
-    expect(requests[1]).toContain('/search-mfe-bff/routing/isochrone');
-    expect(requests[1]).toContain('commuteMode=Walk');
-    expect(requests[1]).toContain('commuteDuration=15');
-    expect(requests[1]).toContain('lat=48.1');
-    expect(requests[1]).toContain('lng=11.6');
+    expect(gotos).toEqual(['https://www.immowelt.de/', SEARCH_URL]);
     expect(posted[0].criteria.location).toEqual({ polylines: [POLYLINE] });
     expect(posted[0].commutes).toBeUndefined();
   });
+
+  // DataDome interstitials about every other navigation to the result page, and the device check
+  // it shows resolves itself: what the first navigation stays silent on, the second one answers.
+  it('navigates again when a search page stays silent, and still searches with the drawn area', async () => {
+    await searchClassifieds(commuteBrowser({ waitFailures: 1 }), COMMUTE_REQUEST, DE);
+
+    expect(gotos).toEqual(['https://www.immowelt.de/', SEARCH_URL, SEARCH_URL]);
+    expect(posted).toHaveLength(1);
+    expect(posted[0].criteria.location).toEqual({ polylines: [POLYLINE] });
+  }, 30_000);
 
   // The BFF unions the polylines of a search, so a drawn area saved next to a commute time has to
   // survive the resolution rather than be replaced by it.
@@ -470,33 +485,37 @@ describe('#immowelt bff transport, commute areas', () => {
     expect(posted[0].criteria.location.polylines).toEqual(['ah{vHm`xrA?ivIj`C??hvIk`C?', POLYLINE]);
   });
 
-  it('leaves a search without a commute area alone, and does not ask the routing service', async () => {
+  it('leaves a search without a commute area alone, and loads no search page for one', async () => {
     await searchClassifieds(commuteBrowser(), SEARCH_REQUEST, DE);
 
-    expect(requests.some((url) => url.includes('/search-mfe-bff/'))).toBe(false);
+    expect(gotos).toEqual(['https://www.immowelt.de/']);
     expect(posted[0].criteria.location).toEqual({ placeIds: ['AD08DE8634'] });
   });
 
   // Searching without the boundary would search the street the commute starts on instead of
-  // everything within reach of it, and report a different set of flats than the job describes.
-  it('stops the run when the routing service will not draw the area', async () => {
-    const browser = commuteBrowser({ routing: { status: 500, body: '<html>Unbekannter Fehler</html>' } });
+  // everything within reach of it, and report a different set of flats than the job describes. A
+  // refusal shares the silence's patience: DataDome refuses one navigation and lets the next one
+  // through, so only when every attempt was refused does the run end.
+  it('stops the run when every search page navigation is refused', async () => {
+    const browser = commuteBrowser({ gotoStatus: 403 });
 
-    await expect(searchClassifieds(browser, COMMUTE_REQUEST, DE)).rejects.toThrow(/commute time/);
+    await expect(searchClassifieds(browser, COMMUTE_REQUEST, DE)).rejects.toThrow(/refused to render/);
+    expect(posted).toHaveLength(0);
+    expect(gotos).toEqual(['https://www.immowelt.de/', SEARCH_URL, SEARCH_URL, SEARCH_URL]);
+  }, 30_000);
+
+  it('stops the run when the count the page posts answers without a boundary', async () => {
+    const browser = commuteBrowser({ count: JSON.stringify({ criteria: { location: {} } }) });
+
+    await expect(searchClassifieds(browser, COMMUTE_REQUEST, DE)).rejects.toThrow(/without a reachable area/);
     expect(posted).toHaveLength(0);
   });
 
-  it('stops the run when the place it should travel from has no coordinates', async () => {
-    const browser = commuteBrowser({ places: { status: 200, body: JSON.stringify({ places: [{}] }) } });
+  it('stops the run when no result count ever arrives on the search page', async () => {
+    const browser = commuteBrowser({ waitError: Object.assign(new Error('timed out'), { name: 'TimeoutError' }) });
 
-    await expect(searchClassifieds(browser, COMMUTE_REQUEST, DE)).rejects.toThrow(/commute time/);
+    await expect(searchClassifieds(browser, COMMUTE_REQUEST, DE)).rejects.toThrow(/never sent/);
     expect(posted).toHaveLength(0);
-  });
-
-  it('stops the run when nothing is reachable in the time the job asks for', async () => {
-    const browser = commuteBrowser({ routing: { status: 200, body: JSON.stringify({ isochrone: [] }) } });
-
-    await expect(searchClassifieds(browser, COMMUTE_REQUEST, DE)).rejects.toThrow(/no reachable area/);
-    expect(posted).toHaveLength(0);
-  });
+    expect(gotos).toEqual(['https://www.immowelt.de/', SEARCH_URL, SEARCH_URL, SEARCH_URL]);
+  }, 30_000);
 });

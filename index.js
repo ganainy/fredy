@@ -27,6 +27,7 @@ import { initPriceTrackingCron } from './lib/services/crons/price-tracking-cron.
 import { initTravelTimeCron } from './lib/services/crons/travel-time-cron.js';
 import { initConnectivityCron } from './lib/services/crons/connectivity-cron.js';
 import { initTourCleanupCron } from './lib/services/crons/tour-cleanup-cron.js';
+import { initSubscriptionCheckCron } from './lib/services/crons/subscription-check-cron.js';
 
 // Ensure the CloakBrowser stealth Chromium binary is present and complete before
 // jobs run.  ensureValidBinary() also detects and auto-heals partial extractions
@@ -125,6 +126,9 @@ initTourCleanupCron();
 // Schedules only. Unlike the others this one is never run on start: it renders a browser page per
 // listing, and a restart is the worst moment to begin doing that.
 initPriceTrackingCron();
+// Same reasoning: schedule only. Whether an advert is members-only never changes, so the run only
+// exists to cover listings that have appeared since it last looked.
+initSubscriptionCheckCron();
 // Same reasoning: schedule only. The sweep talks to a community routing service, and hammering it
 // every time an instance restarts is exactly the behaviour their usage policy asks projects to avoid.
 initTravelTimeCron();

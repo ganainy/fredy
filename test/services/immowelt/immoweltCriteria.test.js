@@ -98,10 +98,10 @@ const PROBES = [
     query: 'bbox=MTMuNzIxNDU3MDAwMDAwMDAxLDUxLjA3NjI4LDEzLjc4NzM3Mjk5OTk5OTk5OSw1MS4xMDExMTk5OTk5OTk5OTU',
   },
   // 30 minutes' cycling of Dresden's centre, which is the city minus its outskirts - and the only
-  // probe whose boundary Fredy has to fetch rather than read out of the url. It proves the whole
-  // chain: the place's coordinates, immowelt's routing service, and the polyline encoding they get
-  // turned into. `{"placeIds":["AD08DE9991"],"duration":"30","mode":"Bike"}`, base64url as the url
-  // carries it.
+  // probe whose boundary Fredy cannot read out of the url: resolving it loads the search page and
+  // reads the area immowelt drew for it, which exercises the whole chain in place of the retired
+  // routing endpoint. `{"placeIds":["AD08DE9991"],"duration":"30","mode":"Bike"}`, base64url as the
+  // url carries it.
   {
     what: 'a commute time',
     base: RENT_BASE,
@@ -144,9 +144,10 @@ describe.skipIf(process.env.TEST_MODE === 'offline')('#immowelt criteria against
   async function total(query) {
     if (totals.has(query)) return totals.get(query);
 
-    const request = convertSearchUrlToRequest(`${IMMOWELT_ORIGIN}/classified-search?${query}`, { size: 1 });
-    // A commute area is a place and a travel time until immowelt's routing service has drawn it,
-    // and only the drawn boundary is something the search BFF can be asked about.
+    const url = `${IMMOWELT_ORIGIN}/classified-search?${query}`;
+    const request = { ...convertSearchUrlToRequest(url, { size: 1 }), searchUrl: url };
+    // A commute area is a place and a travel time until immowelt has drawn it, and only the drawn
+    // boundary is something the search BFF can be asked about - see `resolveCommuteAreas`.
     const result = await searchTotal(await resolveSearchAreas(browser, request, SITES['immowelt.de']));
 
     // A DataDome challenge answers 403 with its own html and says nothing about whether the

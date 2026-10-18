@@ -6,8 +6,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   convertSearchUrlToRequest,
-  encodePolyline,
-  isochroneToPolylines,
   DEFAULT_ORDER,
   DEFAULT_PAGE_SIZE,
 } from '../../../lib/services/immowelt/immowelt-search-model.js';
@@ -410,7 +408,8 @@ describe('#immowelt search model, commute areas', () => {
     expect(() => convertSearchUrlToRequest(`${BASE}?distributionTypes=Buy&locations=${forever}`)).toThrow(/soon/);
   });
 
-  // Only the first id would reach the routing service, so the other places would silently vanish.
+  // Only the place's own coordinates used to reach the old routing endpoint, so the other places
+  // would silently vanish; the site still draws the area from one place at a time.
   it('refuses a commute area drawn around more than one place', () => {
     const two = encoded({ placeIds: ['STRTDE197842', 'AD08DE9991'], duration: '15', mode: 'Walk' });
 
@@ -423,39 +422,5 @@ describe('#immowelt search model, commute areas', () => {
     expect(() => convertSearchUrlToRequest(`${BASE}?distributionTypes=Buy&locations=${partly}`)).toThrow(
       /travelTimeMinutes/,
     );
-  });
-});
-
-// The ring below is what immowelt's routing service answered for the commute area of #430, and the
-// polyline is the string immowelt's own page sent to the BFF for it. Encoding the one has to
-// produce the other character for character, because the BFF reads nothing else.
-describe('#immowelt search model, polyline encoding', () => {
-  const RING = [
-    [11.60531158, 48.09858673],
-    [11.60553739, 48.09829432],
-    [11.60573394, 48.0978433],
-    [11.60581443, 48.09735794],
-    [11.605774, 48.09686761],
-    [11.60561509, 48.096402],
-  ];
-  // The trailing backslash is part of the encoding, not an escape gone missing.
-  const ENCODED = 'egqdHetyeAz@m@xAe@~AO`BF|A\\';
-
-  it('encodes a ring the way immowelt encodes its own', () => {
-    expect(encodePolyline(RING)).toBe(ENCODED);
-  });
-
-  it('encodes nothing as nothing', () => {
-    expect(encodePolyline([])).toBe('');
-  });
-
-  // A transit area comes back as dozens of disjoint islands, and the BFF searches the union of them
-  // - so every ring has to become an entry rather than only the biggest one.
-  it('turns every ring of an isochrone into its own polyline', () => {
-    expect(isochroneToPolylines([[RING], [RING.slice(0, 2)]])).toEqual([ENCODED, 'egqdHetyeAz@m@']);
-  });
-
-  it('turns an empty answer into no polylines at all', () => {
-    expect(isochroneToPolylines([])).toEqual([]);
   });
 });
